@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- Fondo del icono -->
+  <rect width="200" height="200" rx="15" fill="#e6f2f1"/>
+
+  <!-- Edificio principal -->
+  <rect x="50" y="80" width="100" height="80" fill="#4b9aa9" stroke="#2c6775" stroke-width="3"/>
+  <rect x="65" y="95" width="15" height="15" fill="#ffffff"/>
+  <rect x="120" y="95" width="15" height="15" fill="#ffffff"/>
+  <rect x="65" y="120" width="15" height="15" fill="#ffffff"/>
+  <rect x="120" y="120" width="15" height="15" fill="#ffffff"/>
+  <rect x="90" y="110" width="20" height="50" fill="#ffffff"/>
+  
+  <!-- Birrete de graduación -->
+  <polygon points="75,40 125,40 100,55" fill="#2c6775"/>
+  <rect x="97" y="55" width="6" height="20" fill="#2c6775"/>
+  <circle cx="100" cy="75" r="3" fill="#2c6775"/>
+
+  <!-- Árboles -->
+  <circle cx="45" cy="130" r="7" fill="#75b8ba"/>
+  <rect x="43" y="130" width="4" height="10" fill="#4b9aa9"/>
+  <circle cx="155" cy="130" r="7" fill="#75b8ba"/>
+  <rect x="153" y="130" width="4" height="10" fill="#4b9aa9"/>
+
+  <!-- Engranaje (símbolo de gestión tecnológica) -->
+  <circle cx="100" cy="165" r="10" fill="#75b8ba"/>
+  <circle cx="100" cy="165" r="6" fill="#e6f2f1"/>
+  <line x1="100" y1="155" x2="100" y2="150" stroke="#4b9aa9" stroke-width="2"/>
+  <line x1="100" y1="175" x2="100" y2="180" stroke="#4b9aa9" stroke-width="2"/>
+  <line x1="110" y1="165" x2="115" y2="165" stroke="#4b9aa9" stroke-width="2"/>
+  <line x1="90" y1="165" x2="85" y2="165" stroke="#4b9aa9" stroke-width="2"/>
+  <line x1="105" y1="160" x2="108" y2="155" stroke="#4b9aa9" stroke-width="2"/>
+  <line x1="95" y1="160" x2="92" y2="155" stroke="#4b9aa9" stroke-width="2"/>
+  <line x1="105" y1="170" x2="108" y2="175" stroke="#4b9aa9" stroke-width="2"/>
+  <line x1="95" y1="170" x2="92" y2="175" stroke="#4b9aa9" stroke-width="2"/>
+</svg>

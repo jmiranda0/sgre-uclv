@@ -8,6 +8,7 @@ export default {
         './resources/views/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
     ],
+     darkMode: 'class',
     theme: {
         extend: {
           backgroundImage: {

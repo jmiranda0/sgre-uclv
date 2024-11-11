@@ -38,6 +38,8 @@ class RolesSeeder extends Seeder
             'view_residence_info',
             'view_faculty_students',
             'view_assigned_students',
+            'view_year_lead_professors',
+            'view_group_supervisors',
             'manage_residence',
             'approve_applications',
         ];

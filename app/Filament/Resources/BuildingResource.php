@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\CampusEnum;
 use App\Filament\Resources\BuildingResource\Pages;
 use App\Filament\Resources\BuildingResource\RelationManagers;
 use App\Models\Building;
+use Doctrine\DBAL\Schema\Column;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -31,7 +33,12 @@ class BuildingResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('campus')
+                Forms\Components\Select::make('campus')
+                    ->options([
+                        'Universitaria' => CampusEnum :: UNI->value,                        
+                        'Félix Varela' => CampusEnum :: VAREL->value,                        
+                        'Manuel Fajardo' => CampusEnum :: FAJARDO->value,                        
+                    ])
                     ->required(),
             ]);
     }
@@ -66,14 +73,21 @@ class BuildingResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
-                ->tooltip('View Building')
-                ->label('')
-                ->size('xl'),
-                Tables\Actions\EditAction::make()
-                ->tooltip('Edit Building')
-                ->label('')
-                ->size('xl'),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make()
+                        ->tooltip('View Building')
+                        ->label('')
+                        ->size('xl'),
+                    Tables\Actions\EditAction::make()
+                        ->tooltip('Edit Building')
+                        ->label('')
+                        ->size('xl'),
+                    Tables\Actions\DeleteAction::make()
+                        ->tooltip('Delete Building')
+                        ->label('')
+                        ->size('xl'),
+                ])
+                
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

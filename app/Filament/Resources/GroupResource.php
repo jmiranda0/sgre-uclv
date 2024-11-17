@@ -29,6 +29,11 @@ class GroupResource extends Resource
     
     protected static ?int $navigationSort = 10;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('GM') || auth()->user()->hasRole('Faculty_Dean'); 
+    }
+    
     public static function form(Form $form): Form
     {
         return $form
@@ -117,6 +122,10 @@ class GroupResource extends Resource
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
                 ->tooltip('Edit Group')
+                ->label('')
+                ->size('xl'),
+                Tables\Actions\DeleteAction::make()
+                ->tooltip('Delete Group')
                 ->label('')
                 ->size('xl'),
             ])

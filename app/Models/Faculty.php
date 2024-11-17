@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Class Faculty
@@ -34,6 +35,13 @@ class Faculty extends Model
     public function careers():HasMany
     {
         return $this->hasMany(Career::class);
+    }
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function dean():HasOne
+    {
+        return $this->hasOne(Dean::class);
     }
     
 }

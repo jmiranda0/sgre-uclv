@@ -23,6 +23,10 @@ class MunicipalityResource extends Resource
 
     protected static ?int $navigationSort = 5;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('GM') ;
+    }
 
     public static function form(Form $form): Form
     {
@@ -62,6 +66,10 @@ class MunicipalityResource extends Resource
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
                 ->tooltip('Edit Municipality')
+                ->label('')
+                ->size('xl'),
+                Tables\Actions\DeleteAction::make()
+                ->tooltip('Delete Municipality')
                 ->label('')
                 ->size('xl'),
             ])

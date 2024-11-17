@@ -20,6 +20,11 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('GM') ;
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -82,6 +87,10 @@ class UserResource extends Resource
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
                 ->tooltip('Edit User')
+                ->label('')
+                ->size('xl'),
+                Tables\Actions\DeleteAction::make()
+                ->tooltip('Delete User')
                 ->label('')
                 ->size('xl'),
             ])

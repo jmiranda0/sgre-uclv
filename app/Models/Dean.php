@@ -28,25 +28,11 @@ class Dean extends Model
     }
     
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function faculty():HasOne
+    public function faculty():BelongsTo
     {
-        return $this->hasOne(Faculty::class);
+        return $this->belongsTo(Faculty::class);
     }
-    protected static function booted()
-    {   
-            if (request()->has('professor')) {
-                // Crear el profesor antes de guardar el decano
-                dd(request());
-                $professor = Professor::create([
-                    'name' => request('professor.name'),
-                    'dni' => request('professor.dni'),
-                ]);
-                $professor->save();
-                // Asignar el ID del profesor al decano
-                $professor_id = $professor->id;
-                return $professor_id;
-            }
-    }
+    
 }

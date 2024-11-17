@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\FacultyResource\Pages;
-use App\Filament\Resources\FacultyResource\RelationManagers;
-use App\Models\Faculty;
+use App\Filament\Resources\WingSupervisorResource\Pages;
+use App\Filament\Resources\WingSupervisorResource\RelationManagers;
+use App\Models\WingSupervisor;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,28 +13,22 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class FacultyResource extends Resource
+class WingSupervisorResource extends Resource
 {
-    protected static ?string $model = Faculty::class;
+    protected static ?string $model = WingSupervisor::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
-
-    protected static ?string $navigationGroup = 'Academic Management';
-    
-    protected static ?int $navigationSort = 7;
-
-    public static function canAccess(): bool
-    {
-        return auth()->user()->hasRole('GM'); // Solo el Decano puede ver este recurso
-    }
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+                Forms\Components\Select::make('professor_id')
+                    ->relationship('professor', 'name')
+                    ->required(),
+                Forms\Components\TextInput::make('wing_id')
                     ->required()
-                    ->maxLength(255),
+                    ->numeric(),
             ]);
     }
 
@@ -42,8 +36,12 @@ class FacultyResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('professor.name')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('wing_id')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -57,18 +55,7 @@ class FacultyResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
-                ->tooltip('View Faculty')
-                ->label('')
-                ->size('xl'),
-                Tables\Actions\EditAction::make()
-                ->tooltip('Edit Facuty')
-                ->label('')
-                ->size('xl'),
-                Tables\Actions\DeleteAction::make()
-                ->tooltip('Delete Faculty')
-                ->label('')
-                ->size('xl'),
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -87,9 +74,9 @@ class FacultyResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFaculties::route('/'),
-            'create' => Pages\CreateFaculty::route('/create'),
-            'edit' => Pages\EditFaculty::route('/{record}/edit'),
+            'index' => Pages\ListWingSupervisors::route('/'),
+            'create' => Pages\CreateWingSupervisor::route('/create'),
+            'edit' => Pages\EditWingSupervisor::route('/{record}/edit'),
         ];
     }
 }

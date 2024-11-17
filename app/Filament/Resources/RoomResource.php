@@ -23,6 +23,10 @@ class RoomResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('GM') || auth()->user()->hasRole('Residence_Manager');
+    }
 
     public static function form(Form $form): Form
     {
@@ -89,6 +93,10 @@ class RoomResource extends Resource
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
                 ->tooltip('Edit Room')
+                ->label('')
+                ->size('xl'),
+                Tables\Actions\DeleteAction::make()
+                ->tooltip('Delete Room')
                 ->label('')
                 ->size('xl'),
             ])

@@ -19,6 +19,11 @@ class ProfessorResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('GM') ;
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -29,9 +34,19 @@ class ProfessorResource extends Resource
                 Forms\Components\TextInput::make('dni')
                     ->required()
                     ->maxLength(11),
+                // Forms\Components\Select::make('Tipe')
+                // ->placeholder("Select professor's tipe")
+                //     ->options([
+                //         'Residence Manager',                        
+                //         'Wing Supervisor',                        
+                //         'Dean',                        
+                //         'Year Lead Professor',                        
+                //         'Group Advisor',                        
+                //     ])
+                //     ->required(),
             ]);
     }
-
+    
     public static function table(Table $table): Table
     {
         return $table

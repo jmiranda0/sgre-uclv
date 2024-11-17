@@ -28,10 +28,10 @@ class YearLeadProfessor extends Model
     }
     
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function careerYear():HasOne
+    public function careerYear():BelongsTo
     {
-        return $this->hasOne(CareerYear::class);
+        return $this->belongsTo(CareerYear::class);
     }
 }

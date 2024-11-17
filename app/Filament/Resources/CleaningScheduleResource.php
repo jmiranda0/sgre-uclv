@@ -22,6 +22,11 @@ class CleaningScheduleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('GM') || auth()->user()->hasRole('Faculty_Dean') || auth()->user()->hasRole('Residence_Manager');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -75,6 +80,10 @@ class CleaningScheduleResource extends Resource
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
                 ->tooltip('Edit sheldules day')
+                ->label('')
+                ->size('xl'),
+                Tables\Actions\DeleteAction::make()
+                ->tooltip('Delete sheldues day')
                 ->label('')
                 ->size('xl'),
             ])

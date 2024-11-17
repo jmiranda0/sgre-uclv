@@ -23,7 +23,11 @@ class WingResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('GM') || auth()->user()->hasRole('Residence_Manager');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -78,6 +82,10 @@ class WingResource extends Resource
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
                 ->tooltip('Edit Wing')
+                ->label('')
+                ->size('xl'),
+                Tables\Actions\DeleteAction::make()
+                ->tooltip('Delete Wing')
                 ->label('')
                 ->size('xl'),
             ])

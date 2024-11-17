@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Class Group
@@ -44,5 +45,12 @@ class Group extends Model
     public function studens():HasMany
     {
         return $this->hasMany(Student::class);
+    }
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function GroupAdvisor():HasOne
+    {
+        return $this->hasOne(GroupAdvisor::class);
     }
 }

@@ -23,6 +23,11 @@ class ProvinceResource extends Resource
     
     protected static ?int $navigationSort = 4;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('GM') ;
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -58,6 +63,10 @@ class ProvinceResource extends Resource
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
                 ->tooltip('Edit Province')
+                ->label('')
+                ->size('xl'),
+                Tables\Actions\DeleteAction::make()
+                ->tooltip('Delete Province')
                 ->label('')
                 ->size('xl'),
             ])

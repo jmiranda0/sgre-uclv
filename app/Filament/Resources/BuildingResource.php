@@ -25,6 +25,10 @@ class BuildingResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('GM') || auth()->user()->hasRole('Residence_Manager');
+    }
 
     public static function form(Form $form): Form
     {
@@ -34,6 +38,8 @@ class BuildingResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('campus')
+                    ->label('Campus')
+                    ->placeholder('Select a campus')
                     ->options([
                         'Universitaria' => CampusEnum :: UNI->value,                        
                         'Félix Varela' => CampusEnum :: VAREL->value,                        

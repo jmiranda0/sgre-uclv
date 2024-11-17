@@ -34,6 +34,11 @@ class StudentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
+    public static function canAccess(): bool
+    {
+        return !auth()->user()->hasRole('Student');
+    }
+    
     public static function form(Form $form): Form
 {
     return $form
@@ -267,6 +272,10 @@ class StudentResource extends Resource
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
                 ->tooltip('Edit Student')
+                ->label('')
+                ->size('xl'),
+                Tables\Actions\DeleteAction::make()
+                ->tooltip('Delete Student')
                 ->label('')
                 ->size('xl'),
             ])

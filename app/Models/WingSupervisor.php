@@ -28,10 +28,10 @@ class WingSupervisor extends Model
     }
     
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function wing():HasOne
+    public function wing():BelongsTo
     {
-        return $this->hasOne(Wing::class);
+        return $this->belongsTo(Wing::class);
     }
 }

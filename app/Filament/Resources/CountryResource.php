@@ -23,6 +23,11 @@ class CountryResource extends Resource
 
     protected static ?int $navigationSort = 6;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('GM') || auth()->user()->hasRole('Dean');
+    }
+    
     public static function form(Form $form): Form
     {
         return $form
@@ -61,6 +66,10 @@ class CountryResource extends Resource
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
                 ->tooltip('Edit Country')
+                ->label('')
+                ->size('xl'),
+                Tables\Actions\DeleteAction::make()
+                ->tooltip('Delete Country')
                 ->label('')
                 ->size('xl'),
             ])

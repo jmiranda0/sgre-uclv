@@ -28,10 +28,10 @@ class GroupAdvisor extends Model
     }
     
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function group():HasOne
+    public function group():BelongsTo
     {
-        return $this->hasOne(Group::class);
+        return $this->belongsTo(Group::class);
     }
 }

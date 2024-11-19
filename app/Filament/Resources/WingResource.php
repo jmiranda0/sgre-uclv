@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\WingResource\Pages;
 use App\Filament\Resources\WingResource\RelationManagers;
+use App\Filament\Resources\WingResource\RelationManagers\RoomsRelationManager;
 use App\Models\Wing;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -99,7 +100,7 @@ class WingResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RoomsRelationManager::class
         ];
     }
 

@@ -33,6 +33,15 @@ class CareerYearResource extends Resource
         return auth()->user()->hasRole('GM') || auth()->user()->hasRole('Faculty_Dean'); 
     }
     
+
+    public static function getEloquentQuery(): Builder
+    {
+        $user = auth()->user();
+
+        return static::getModel()::query()
+            ->visibleForUser($user); // Aplicamos el scope definido
+    }
+
     public static function form(Form $form): Form
     {
         return $form

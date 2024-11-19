@@ -20,7 +20,8 @@ class ListStudents extends ListRecords
     }
     public function getTabs(): array
     {
-        $tabs = [
+        if(!auth()->user()->hasRole('Wing_Supervisor') && !auth()->user()->hasRole('Faculty_Dean') && !auth()->user()->hasRole('Year_Lead_Professor')){
+            $tabs = [
             'local_students' => Tab::make('Local Students')
                 ->badge(Student::where('is_foreign', false)->count())
                 ->modifyQueryUsing(function ($query) {
@@ -34,6 +35,8 @@ class ListStudents extends ListRecords
         ];
     
         return $tabs;
+        }
+        return [];
     }
     public function getCurrentTab(): string
 {

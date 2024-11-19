@@ -37,7 +37,7 @@ class Faculty extends Model
         return $this->hasMany(Career::class);
     }
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function dean():HasOne
     {

@@ -22,18 +22,20 @@ class ListCareers extends ListRecords
     {
         $careers = Career::orderBy('id', 'asc')
             ->get();
- 
-        foreach ($careers as $career) {
-            $name = $career->faculty->name;
-            $slug = str($name)->slug()->toString();
- 
-            $tabs[$slug] = Tab::make($name)
-                ->badge(Career::where('faculty_id', $career->faculty->id)->count())
-                ->modifyQueryUsing(function ($query) use ($career) {
-                    return $query->where('faculty_id', $career->faculty->id);
-                });
-        }
+        if(!$careers->isempty() && !auth()->user()->hasRole('Faculty_Dean')){
+            foreach ($careers as $career) {
+                $name = $career->faculty->name;
+                $slug = str($name)->slug()->toString();
     
-        return $tabs;
+                $tabs[$slug] = Tab::make($name)
+                    ->badge(Career::where('faculty_id', $career->faculty->id)->count())
+                    ->modifyQueryUsing(function ($query) use ($career) {
+                        return $query->where('faculty_id', $career->faculty->id);
+                    });
+            }
+    
+            return $tabs;
+        }
+            return [];
     }
 }

@@ -22,18 +22,20 @@ class ListMunicipalities extends ListRecords
     {
         $municipalitys = Municipality::orderBy('id', 'asc')
             ->get();
- 
-        foreach ($municipalitys as $municipality) {
-            $name = $municipality->province->name;
-            $slug = str($name)->slug()->toString();
- 
-            $tabs[$slug] = Tab::make($name)
-                ->badge(Municipality::where('province_id', $municipality->province->id)->count())
-                ->modifyQueryUsing(function ($query) use ($municipality) {
-                    return $query->where('province_id', $municipality->province->id);
-                });
+        if(!$municipalitys->isempty()){
+            foreach ($municipalitys as $municipality) {
+                $name = $municipality->province->name;
+                $slug = str($name)->slug()->toString();
+    
+                $tabs[$slug] = Tab::make($name)
+                    ->badge(Municipality::where('province_id', $municipality->province->id)->count())
+                    ->modifyQueryUsing(function ($query) use ($municipality) {
+                        return $query->where('province_id', $municipality->province->id);
+                    });
+            }
+            return $tabs;
         }
- 
-        return $tabs;
+        return [];
+
     }
 }

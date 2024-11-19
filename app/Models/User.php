@@ -45,4 +45,23 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    /**
+     * Relación con el modelo Student
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function student()
+    {
+        return $this->hasOne(Student::class);
+    }
+
+    /**
+     * Relación con el modelo Professor
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function professor()
+    {
+        return $this->hasOne(Professor::class);
+    }
 }

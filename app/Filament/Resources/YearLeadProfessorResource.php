@@ -32,7 +32,13 @@ class YearLeadProfessorResource extends Resource
     {
         return auth()->user()->hasRole('GM') || auth()->user()->hasRole('Faculty_Dean');
     }
+    public static function getEloquentQuery(): Builder
+    {
+        $user = auth()->user();
 
+        return static::getModel()::query()
+            ->visibleForUser($user); // Aplicamos el scope definido
+    }
     public static function form(Form $form): Form
     {
         return $form
@@ -48,6 +54,16 @@ class YearLeadProfessorResource extends Resource
                     }),
                 Forms\Components\TextInput::make('professor.dni')
                     ->required()
+                    ->afterStateUpdated(function (callable $set, $state) {
+                        $existingdni = Professor::where('dni', $state)->first();
+                        
+                        if ($existingdni) {
+                            $set('dni_exists', true); // Marcamos que el correo existe
+                        } else {
+                            $set('dni_exists', false); // Si no existe, marcamos que no existe
+                        }
+                    })
+                    ->helperText(fn (callable $get) => $get('dni_exists') ? 'Warning! This DNI already exists. Please change it.' : null)
                     ->afterStateHydrated(function (Set $set, $record) {
                         if ($record && $record->professor) {
                             $professordni = $record->professor->dni;
@@ -75,9 +91,14 @@ class YearLeadProfessorResource extends Resource
                 Forms\Components\Select::make('career_id')
                     ->label('career')
                     ->placeholder('Select a career')
-                    ->options( fn (Get $get): Collection => Career::query()
-                                    ->where('faculty_id', auth()->user()->hasRole('GM')? $get('faculty_id') : ['dd()'])
-                                    ->pluck('name','id')  
+                    ->options( auth()->user()->hasRole('GM')? 
+                                 fn (Get $get): Collection => Career::query()
+                                    ->where('faculty_id', $get('faculty_id'))
+                                    ->pluck('name','id')
+                                :  
+                                fn (): Collection => Career::query()
+                                    ->where('faculty_id', auth()->user()->professor->dean->faculty->id)
+                                    ->pluck('name','id')
                         )
                     ->searchable()
                     ->preload()
@@ -91,6 +112,7 @@ class YearLeadProfessorResource extends Resource
                     }),
                 Forms\Components\Select::make('career_year_id')
                     ->label('academic year')
+                    ->relationship(name:'careerYear', titleAttribute: 'name')
                     ->options(fn (Get $get): Collection => CareerYear::query()
                                             ->where('career_id', $get('career_id'))
                                             ->pluck('name','id')
@@ -99,12 +121,6 @@ class YearLeadProfessorResource extends Resource
                     ->preload()
                     ->live()
                     ->placeholder('Select an acacemic year')
-                    ->afterStateHydrated(function (Set $set, $record) {
-                        if ($record && $record->careerYear) {
-                            $careername = $record->careerYear->name;
-                            $set('career_year_id', $careername);
-                        }
-                    })
                     ->required(),
                 
             ]);

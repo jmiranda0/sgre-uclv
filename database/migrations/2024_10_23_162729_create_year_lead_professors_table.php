@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -21,6 +22,8 @@ return new class extends Migration
                     ->constrained('career_years')
                     ->cascadeOnDelete()
                     ->cascadeOnUpdate();
+            $table->date('start_date')->default(now());
+            $table->date('end_date')->nullable();
             $table->timestamps();
         });
     }

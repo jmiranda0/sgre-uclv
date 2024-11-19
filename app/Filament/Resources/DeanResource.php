@@ -18,6 +18,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
+use Illuminate\Validation\ValidationException;
 
 class DeanResource extends Resource
 {
@@ -34,28 +36,67 @@ class DeanResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('professor.name')
-                     ->required()
-                     ->label('Name')
-                     ->afterStateHydrated(function (Set $set, $record) {
-                        if ($record && $record->professor) {
-                            $professorname = $record->professor->name;
-                            $set('professor.name', $professorname);
-                        }
-                    }),
-                Forms\Components\TextInput::make('professor.dni')
-                    ->required()
-                    ->afterStateHydrated(function (Set $set, $record) {
-                        if ($record && $record->professor) {
-                            $professordni = $record->professor->dni;
-                            $set('professor.dni', $professordni);
-                        }
-                    }),
-                Forms\Components\Select::make('faculty_id')
-                    ->relationship('faculty', 'name')
-                    ->required(),
+                
+                Forms\Components\Section::make('Datos del Profesor')
+                    ->schema([    
+                            Forms\Components\TextInput::make('professor.name')
+                                ->required()
+                                ->label('Name')
+                                ->reactive()
+                                ->afterStateHydrated(function (Set $set, $record) {
+                                    if ($record && $record->professor) {
+                                        $professorname = $record->professor->name;
+                                        $set('professor.name', $professorname);
+                                    }
+                                })
+                                ->visible(fn (callable $get) => !$get('existing_P')),
+
+                            Forms\Components\TextInput::make('professor.dni')
+                                ->required()
+                                ->reactive()
+                                ->afterStateUpdated(function (callable $set, $state) {
+                                    $existingdni = Professor::where('dni', $state)->first();
+                                    
+                                    if ($existingdni) {
+                                        $set('dni_exists', true); // Marcamos que el correo existe
+                                    } else {
+                                        $set('dni_exists', false); // Si no existe, marcamos que no existe
+                                    }
+                                })
+                                ->helperText(fn (callable $get) => $get('dni_exists') ? 'Warning! This DNI already exists. Please change it.' : null)
+                                ->afterStateHydrated(function (Set $set, $record) {
+                                    if ($record && $record->professor) {
+                                        $professordni = $record->professor->dni;
+                                        $set('professor.dni', $professordni);
+                                    }
+                                })
+                                ->visible(fn (callable $get) => !$get('existing_P')),
+                                
+                            Forms\Components\Select::make('professor_id')
+                                ->relationship('professor', 'name')
+                                ->disabled(fn (callable $get) => !$get('existing_P')) // Solo habilitado si existing_P es verdadero
+                                ->visible(fn (callable $get) => $get('existing_P'))
+                                ->preload()
+                                ->live()
+                                ->searchable()
+                                ->required()
+                                ->columnSpanFull(),
+
+                            Forms\Components\Toggle::make('existing_P')
+                                ->label('Existing Professor')
+                                ->reactive(),
+                        ])
+                        ->collapsible()
+                        ->columns(2),
+                Forms\Components\Section::make('Asignación de facultad')
+                    ->schema([    
+                            Forms\Components\Select::make('faculty_id')
+                            ->relationship('faculty', 'name')
+                            ->required(),
+                    ])
             ]);
     }
+   
     
     public static function table(Table $table): Table
     {

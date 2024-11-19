@@ -17,16 +17,16 @@ class EditDean extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
-    protected function mutateFormDataBefore(array $data)
+    function mutateFormDataBeforeSave(array $data): array
     {
-        // Crear el profesor con los datos del formulario
-        $professor = Professor::find([
-            $data['professor']['id'],
-           
-        ]);
-        dd($professor);
-        $professor->update($data);
-        // Retornar los datos modificados para crear el decano
-        
+    
+        // buscar el profesor con el dni del formulario
+        $professor = Professor::where('dni',$data['professor']['dni'])->first();
+        // actualizar el profesor encontrado con los datos del formulario
+        $professor -> update($data['professor']);
+        // Asignar el professor_id al yearLeadProfessor
+        $data['professor_id'] = $professor->id;
+         // Retornar los datos modificados para crear el yearLeadProfessor
+        return $data;
     }
 }

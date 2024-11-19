@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  *
  * @property $id
  * @property $name
- * @property $rooms_amoun
  * @property $building_id
  * @property $created_at
  * @property $updated_at

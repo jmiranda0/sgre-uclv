@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\hasOne;
 
 /**
  * Class Professor
@@ -25,38 +25,51 @@ class Professor extends Model
      *
      * @var array
      */
-    protected $fillable = ['name','dni'];
+    protected $fillable = [
+                            'name',
+                            'dni',
+                            'user_id',
+                        ];
     
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function deans():HasMany
+    public function dean():HasOne
     {
-        return $this->hasMany(Dean::class);
+        return $this->hasOne(Dean::class);
     }
     
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function yearLeadProfessors():HasMany
+    public function yearLeadProfessor():HasOne
     {
-        return $this->hasMany(YearLeadProfessor::class);
+        return $this->hasOne(YearLeadProfessor::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function wingSupervisors():HasMany
+    public function wingSupervisor():HasOne
     {
-        return $this->hasMany(WingSupervisor::class);
+        return $this->hasOne(WingSupervisor::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function groupAdvisors():HasMany
+    public function groupAdvisor():HasOne
     {
-        return $this->hasMany(GroupAdvisor::class);
+        return $this->hasOne(GroupAdvisor::class);
     }
     
+    /**
+     * Relación inversa con el modelo User
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\CampusEnum;
 use App\Filament\Resources\BuildingResource\Pages;
 use App\Filament\Resources\BuildingResource\RelationManagers;
+use App\Filament\Resources\BuildingResource\RelationManagers\WingsRelationManager;
 use App\Models\Building;
 use Doctrine\DBAL\Schema\Column;
 use Filament\Forms;
@@ -79,7 +80,7 @@ class BuildingResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ActionGroup::make([
+                
                     Tables\Actions\ViewAction::make()
                         ->tooltip('View Building')
                         ->label('')
@@ -94,18 +95,18 @@ class BuildingResource extends Resource
                         ->size('xl'),
                 ])
                 
-            ])
+          
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
-
+    
     public static function getRelations(): array
     {
         return [
-            //
+            WingsRelationManager::class
         ];
     }
 

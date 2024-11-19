@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('last_name');
             $table->string('dni',11)->unique();
-            $table->string('scholarship_card')->unique();
+            $table->string('scholarship_card')->unique()->nullable();
             $table->boolean('is_foreign')->default(false);
             $table->foreignId('country_id')
                     ->nullable()
@@ -28,11 +28,15 @@ return new class extends Migration
                     ->cascadeOnDelete();
             $table->foreignId('group_id')
                     ->nullable()
-                    ->constrained('Groups')
+                    ->constrained('groups')
                     ->cascadeOnDelete();
             $table->foreignId('room_id')
                     ->nullable()
-                    ->constrained('Rooms')
+                    ->constrained('rooms')
+                    ->cascadeOnDelete();
+            $table->foreignId('user_id')
+                    ->nullable()
+                    ->constrained('users')
                     ->cascadeOnDelete();
             $table->timestamps();
         });

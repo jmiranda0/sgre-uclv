@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ComplaintStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,6 +14,14 @@ return new class extends Migration
     {
         Schema::create('complaints', function (Blueprint $table) {
             $table->id();
+            $table->string('theme');
+            $table->text('text');
+            $table->enum('status', ComplaintStatusEnum::getValues())  // Usamos el enum de ComplaintStatus
+                  ->default(ComplaintStatusEnum::PENDING->value);  // Valor predeterminado
+            $table->foreignId('student_id')
+                    ->constrained('students')
+                    ->cascadeOnDelete()
+                    ->cascadeOnUpdate();
             $table->timestamps();
         });
     }

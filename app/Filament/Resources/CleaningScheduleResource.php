@@ -67,22 +67,20 @@ class CleaningScheduleResource extends Resource
                     // ->afterStateUpdated(function($record){
                     //     dd($record->students->pivot);
                     // }),
-                    Forms\Components\Select::make('student_id') // Campo de selección múltiple de estudiantes
-                    ->label('Assigned Students')
-                    ->relationship('students','name')
-                    ->preload()
-                    ->live()
-                    ->multiple() // Permite seleccionar varios estudiantes
-                    ->options(auth()->user()->hasRole('Wing_Supervisor')?
-                                        function () {
-                                            return Student::whereHas('room', fn ($query) => $query->where('wing_id', auth()->user()->professor->wingsupervisors->wing->id))
-                                                ->pluck('name', 'id');
-                                        }
-                                        :
-                                        Student::all()->pluck('name', 'id')
-                                
-                                ) // Cargar todos los estudiantes
-                    ->required(),
+                    Forms\Components\Select::make('student_id')
+                        ->label('Assigned Students')
+                        ->relationship('students', 'name')
+                        ->multiple()
+                        ->searchable() // Permite buscar estudiantes
+                        //->lazy() // Carga diferida
+                        //->getOptionLabelUsing(fn ($value) => Student::find($value)?->name) // Muestra el nombre en la opción seleccionada
+                        ->options(function () {
+                            return auth()->user()->hasRole('Wing_Supervisor')
+                                ? Student::whereHas('room', fn ($query) => $query->where('wing_id', auth()->user()->professor->wingsupervisor->wing->id))
+                                    ->pluck('name', 'id')
+                                : Student::pluck('name', 'id');
+                        })
+
             ]);
     }
 

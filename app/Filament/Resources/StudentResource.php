@@ -282,7 +282,7 @@ class StudentResource extends Resource
                             ->relationship(name:'room', titleAttribute:'number')
                             ->options(auth()->user()->hasRole('Wing_Supervisor')?
                                         fn (): Collection => Room::query()
-                                            ->where('wing_id', auth()->user()->professor->wingsupervisors->wing->id)
+                                            ->where('wing_id', auth()->user()->professor->wingsupervisor->wing->id)
                                             ->where('is_available', true)
                                             ->pluck('number', 'id')
                                         :

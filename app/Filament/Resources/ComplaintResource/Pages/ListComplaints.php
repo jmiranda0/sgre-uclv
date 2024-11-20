@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\ComplaintResource\Pages;
 
+use App\Enums\ComplaintStatusEnum;
 use App\Filament\Resources\ComplaintResource;
+use App\Filament\Resources\ComplaintResource\Widgets\ComplaintStats;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Database\Eloquent\Builder;
 
 class ListComplaints extends ListRecords
 {
@@ -16,4 +19,11 @@ class ListComplaints extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+    protected function getHeaderWidgets(): array
+{
+    return [
+        ComplaintStats::class,
+    ];
+}
+
 }

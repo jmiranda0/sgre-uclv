@@ -16,6 +16,9 @@ class CreateYearLeadProfessor extends CreateRecord
     
     protected function mutateFormDataBeforeCreate(array $data): array
 {
+    if($data['existing_P']){
+        return $data;
+    }
     // Comprobar si el DNI ya existe
     if (Professor::where('dni', $data['professor']['dni'])->exists()) {
         // Notificar al usuario

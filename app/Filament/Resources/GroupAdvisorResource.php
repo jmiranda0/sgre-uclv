@@ -9,6 +9,7 @@ use App\Models\CareerYear;
 use App\Models\Group;
 use App\Models\GroupAdvisor;
 use App\Models\Municipality;
+use App\Models\Professor;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -33,7 +34,7 @@ class GroupAdvisorResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()->hasRole('GM') || auth()->user()->hasRole('career_Dean');
+        return auth()->user()->hasRole('GM') || auth()->user()->hasRole('Faculty_Dean');
     }
     
     public static function canViewAny(): bool
@@ -45,49 +46,94 @@ class GroupAdvisorResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('professor.name')
-                     ->required()
-                     ->label('Name')
-                     ->afterStateHydrated(function (Set $set, $record) {
-                        if ($record && $record->professor) {
-                            $professorname = $record->professor->name;
-                            $set('professor.name', $professorname);
-                        }
-                    }),
-                Forms\Components\TextInput::make('professor.dni')
-                    ->required()
-                    ->afterStateHydrated(function (Set $set, $record) {
-                        if ($record && $record->professor) {
-                            $professordni = $record->professor->dni;
-                            $set('professor.dni', $professordni);
-                        }
-                    }),
-                Forms\Components\Select::make('career_id')
-                    ->label('career')
-                    ->placeholder('Select a career')
-                    ->options(Career::all()->pluck('name', 'id'))
-                    ->searchable()
-                    ->preload()
-                    ->live()
-                    ->afterStateUpdated(fn(Set $set) => $set('career_year_id', null)) 
-                    ->afterStateHydrated(function (Set $set, $record) {
-                        if ($record && $record->group) {
-                            $careername = $record->group->careerYear->career->name;
-                            $set('career_id', $careername);
-                        }
-                    }),
-                Forms\Components\Select::make('career_year_id')
-                    ->label('academic year')
-                    ->options(fn (Get $get): Collection => CareerYear::query()
-                                            ->where('career_id', $get('career_id'))
-                                            ->pluck('name','id')
-                                    )
-                    ->searchable()
-                    ->preload()
-                    ->live()
-                    ->placeholder('Select an acacemic year'),
+                    Forms\Components\Section::make('Datos del Profesor')
+                        ->schema([    
+                            Forms\Components\TextInput::make('professor.name')
+                                ->required()
+                                ->label('Name')
+                                ->reactive()
+                                ->afterStateHydrated(function (Set $set, $record) {
+                                    if ($record && $record->professor) {
+                                        $professorname = $record->professor->name;
+                                        $set('professor.name', $professorname);
+                                    }
+                                })
+                                ->visible(fn (callable $get) => !$get('existing_P')),
+                            Forms\Components\TextInput::make('professor.dni')
+                                ->required()
+                                ->reactive()
+                                ->afterStateUpdated(function (callable $set, $state) {
+                                    $existingdni = Professor::where('dni', $state)->first();
+                                    
+                                    if ($existingdni) {
+                                        $set('dni_exists', true); // Marcamos que el correo existe
+                                    } else {
+                                        $set('dni_exists', false); // Si no existe, marcamos que no existe
+                                    }
+                                })
+                                ->helperText(fn (callable $get) => $get('dni_exists') ? 'Warning! This DNI already exists. Please change it.' : null)
+                                ->afterStateHydrated(function (Set $set, $record) {
+                                    if ($record && $record->professor) {
+                                        $professordni = $record->professor->dni;
+                                        $set('professor.dni', $professordni);
+                                    }
+                                })
+                                ->visible(fn (callable $get) => !$get('existing_P')),
+                                
+                            Forms\Components\Select::make('professor_id')
+                                ->relationship('professor', 'name')
+                                ->options(function () { 
+                                    // Aquí obtienes a los profesores que no están asociados
+                                    return Professor::whereDoesntHave('yearleadprofessor') // Asegúrate de que no están en la tabla de PPAs
+                                        ->whereDoesntHave('groupadvisor')  // Asegúrate de que no están en la tabla de PGs
+                                        ->whereDoesntHave('dean') // Asegúrate de que no están en la tabla de Decanos
+                                        ->whereDoesntHave('wingSupervisor') // Asegúrate de que no están en la tabla de Supervisores de Ala
+                                        ->pluck('name', 'id'); // Obtener solo el nombre y el id
+                                })
+                                ->disabled(fn (callable $get) => !$get('existing_P')) // Solo habilitado si existing_P es verdadero
+                                ->visible(fn (callable $get) => $get('existing_P'))
+                                ->preload()
+                                ->live()
+                                ->searchable()
+                                ->required()
+                                ->columnSpanFull(),
+                            Forms\Components\Toggle::make('existing_P')
+                                ->label('Existing Professor')
+                                ->reactive(),
+                        ])
+                            ->collapsible()
+                            ->columns(2),
+                    
 
-                Forms\Components\Select::make('group_id')
+
+
+                    
+                    Forms\Components\Select::make('career_id')
+                        ->label('career')
+                        ->placeholder('Select a career')
+                        ->options(Career::all()->pluck('name', 'id'))
+                        ->searchable()
+                        ->preload()
+                        ->live()
+                        ->afterStateUpdated(fn(Set $set) => $set('career_year_id', null)) 
+                        ->afterStateHydrated(function (Set $set, $record) {
+                            if ($record && $record->group) {
+                                $careername = $record->group->careerYear->career->name;
+                                $set('career_id', $careername);
+                            }
+                        }),
+                    Forms\Components\Select::make('career_year_id')
+                        ->label('academic year')
+                        ->options(fn (Get $get): Collection => CareerYear::query()
+                                                ->where('career_id', $get('career_id'))
+                                                ->pluck('name','id')
+                                        )
+                        ->searchable()
+                        ->preload()
+                        ->live()
+                        ->placeholder('Select an acacemic year'),
+
+                    Forms\Components\Select::make('group_id')
                     ->relationship(name:'group',titleAttribute:'group_number')
                     ->placeholder('Select a group')
                     ->options(fn (Get $get): Collection => Group::query()

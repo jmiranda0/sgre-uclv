@@ -74,6 +74,14 @@ class DeanResource extends Resource
                                 
                             Forms\Components\Select::make('professor_id')
                                 ->relationship('professor', 'name')
+                                ->options(function () { 
+                                    // Aquí obtienes a los profesores que no están asociados
+                                    return Professor::whereDoesntHave('yearleadprofessor') // Asegúrate de que no están en la tabla de PPAs
+                                        ->whereDoesntHave('groupadvisor')  // Asegúrate de que no están en la tabla de PGs
+                                        ->whereDoesntHave('dean') // Asegúrate de que no están en la tabla de Decanos
+                                        ->whereDoesntHave('wingSupervisor') // Asegúrate de que no están en la tabla de Supervisores de Ala
+                                        ->pluck('name', 'id'); // Obtener solo el nombre y el id
+                                })
                                 ->disabled(fn (callable $get) => !$get('existing_P')) // Solo habilitado si existing_P es verdadero
                                 ->visible(fn (callable $get) => $get('existing_P'))
                                 ->preload()

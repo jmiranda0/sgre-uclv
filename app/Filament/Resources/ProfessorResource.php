@@ -59,7 +59,7 @@ class ProfessorResource extends Resource
                     ])
                     ->collapsible()
                     ->columns(2),
-                    Forms\Components\Section::make('Usuario Asociado')
+                Forms\Components\Section::make('Usuario Asociado')
                     ->schema([
                         
                         Forms\Components\Select::make('user_id')
@@ -69,9 +69,10 @@ class ProfessorResource extends Resource
                         ->disabled(fn (callable $get) => !$get('existing_user')) // Solo habilitado si existing_user es verdadero
                         ->visible(fn (callable $get) => $get('existing_user'))
                         ->options(function (callable $get) {
-                            // Filtra los usuarios que NO están asociados a un profesor
-                            return User::whereDoesntHave('professor') // Suponiendo que "professor" es la relación
-                                ->pluck('email', 'id');
+                            // Filtra los usuarios que NO están asociados a un profesor o estudiante
+                            return User::whereDoesntHave('professor') 
+                                            ->whereDoesntHave('student')
+                                            ->pluck('email', 'id');
                         })->columnSpanFull(),
     
                         Forms\Components\TextInput::make('user.email')

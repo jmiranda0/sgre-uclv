@@ -34,43 +34,50 @@ class WingSupervisorResource extends Resource
     {
         return $form
             ->schema([
-
                 Forms\Components\Section::make('Datos del Profesor')
-                    ->schema([
+                    ->schema([    
                         Forms\Components\TextInput::make('professor.name')
                             ->required()
-                            ->visible(fn (callable $get) => !$get('existing_P'))
-                            ->maxLength(255)
+                            ->label('Name')
+                            ->reactive()
                             ->afterStateHydrated(function (Set $set, $record) {
                                 if ($record && $record->professor) {
                                     $professorname = $record->professor->name;
                                     $set('professor.name', $professorname);
                                 }
-                            }),
+                            })
+                            ->visible(fn (callable $get) => !$get('existing_P')),
                         Forms\Components\TextInput::make('professor.dni')
                             ->required()
-                            ->unique('professors', 'dni',null,ignoreRecord: true)
-                            ->maxLength(11)
-                            ->visible(fn (callable $get) => !$get('existing_P'))
                             ->reactive()
                             ->afterStateUpdated(function (callable $set, $state) {
-                            $existingdni = Professor::where('dni', $state)->first();
+                                $existingdni = Professor::where('dni', $state)->first();
+                                
+                                if ($existingdni) {
+                                    $set('dni_exists', true); // Marcamos que el correo existe
+                                } else {
+                                    $set('dni_exists', false); // Si no existe, marcamos que no existe
+                                }
+                            })
+                            ->helperText(fn (callable $get) => $get('dni_exists') ? 'Warning! This DNI already exists. Please change it.' : null)
+                            ->afterStateHydrated(function (Set $set, $record) {
+                                if ($record && $record->professor) {
+                                    $professordni = $record->professor->dni;
+                                    $set('professor.dni', $professordni);
+                                }
+                            })
+                            ->visible(fn (callable $get) => !$get('existing_P')),
                             
-                            if ($existingdni) {
-                                $set('dni_exists', true); // Marcamos que el correo existe
-                            } else {
-                                $set('dni_exists', false); // Si no existe, marcamos que no existe
-                            }
-                        })
-                        ->helperText(fn (callable $get) => $get('dni_exists') ? 'Warning! This DNI already exists. Please change it.' : null)
-                        ->afterStateHydrated(function (Set $set, $record) {
-                            if ($record && $record->professor) {
-                                $professordni = $record->professor->dni;
-                                $set('professor.dni', $professordni);
-                            }
-                        }),
                         Forms\Components\Select::make('professor_id')
                             ->relationship('professor', 'name')
+                            ->options(function () { 
+                                // Aquí obtienes a los profesores que no están asociados
+                                return Professor::whereDoesntHave('yearleadprofessor') // Asegúrate de que no están en la tabla de PPAs
+                                    ->whereDoesntHave('groupadvisor')  // Asegúrate de que no están en la tabla de PGs
+                                    ->whereDoesntHave('dean') // Asegúrate de que no están en la tabla de Decanos
+                                    ->whereDoesntHave('wingSupervisor') // Asegúrate de que no están en la tabla de Supervisores de Ala
+                                    ->pluck('name', 'id'); // Obtener solo el nombre y el id
+                            })
                             ->disabled(fn (callable $get) => !$get('existing_P')) // Solo habilitado si existing_P es verdadero
                             ->visible(fn (callable $get) => $get('existing_P'))
                             ->preload()
@@ -78,76 +85,74 @@ class WingSupervisorResource extends Resource
                             ->searchable()
                             ->required()
                             ->columnSpanFull(),
-
                         Forms\Components\Toggle::make('existing_P')
-                            ->label('existing Person')
+                            ->label('Existing Professor')
                             ->reactive(),
-                    ])
+                ])
                     ->collapsible()
                     ->columns(2),
 
-
-            Forms\Components\Section::make('Asignación del responsable de beca')
-                ->schema([
-                    Forms\Components\Select::make('campus')
-                            ->label('Campus')
-                            ->options([
-                                'Universitaria' => 'Universitaria',
-                                'Félix Varela' => 'Félix Varela',
-                                'Manuel Fajardo' => 'Manuel Fajardo',
-                            ])
-                            ->searchable()
-                            ->preload()
-                            ->live() // Reactivo para cambiar los edificios disponibles
-                            ->required()
-                            ->afterStateUpdated(function (Set $set) 
-                                { 
-                                    $set('building_id', null);
-                                    $set('wing_id', null);
-                                }
-                            )
-                            ->afterStateHydrated(function (Set $set, $record) {
-                                if ($record && $record->wing) {
-                                    $buildingCampus = $record->wing->building->campus;
-                                    $set('campus', $buildingCampus);
-                                }
-                            })
-                            ->placeholder('Select a campus'),
-
-                        // Campo para seleccionar el edificio (filtrado por sede)
-                        Forms\Components\Select::make('building_id')
-                            ->label('Building')
-                            ->options(fn (Get $get): Collection => Building::query()
-                                            ->where('campus', $get('campus'))
-                                            ->pluck('name', 'id')
-                            )->searchable()
-                            ->preload()
-                            ->live() // Reactivo para cambiar las alas disponibles
-                            ->required()
-                            ->afterStateUpdated(function (Set $set) 
-                                { 
-                                    $set('wing_id', null);
-                                }
-                            )
-                            ->afterStateHydrated(function (Set $set, $record) {
-                                if ($record && $record->wing) {
-                                    $buildingName = $record->wing->building->name;
-                                    $set('building_id', $buildingName);
-                                }
-                            })
-                            ->placeholder('Select a building'),
-                Forms\Components\Select::make('wing_id')
-                    ->required()
-                    ->relationship('wing', 'name')
-                    ->options(fn (Get $get): Collection => Wing::query()
-                                ->where('building_id', $get('building_id'))
-                                ->pluck('name', 'id')
+                Forms\Components\Section::make('Asignación del responsable de beca')
+                    ->schema([
+                        Forms\Components\Select::make('campus')
+                                ->label('Campus')
+                                ->options([
+                                    'Universitaria' => 'Universitaria',
+                                    'Félix Varela' => 'Félix Varela',
+                                    'Manuel Fajardo' => 'Manuel Fajardo',
+                                ])
+                                ->searchable()
+                                ->preload()
+                                ->live() // Reactivo para cambiar los edificios disponibles
+                                ->required()
+                                ->afterStateUpdated(function (Set $set) 
+                                    { 
+                                        $set('building_id', null);
+                                        $set('wing_id', null);
+                                    }
                                 )
-                    ->searchable()
-                    ->preload()
-                    ->live(),
-                ])->collapsible()
-                ->columns(2),
+                                ->afterStateHydrated(function (Set $set, $record) {
+                                    if ($record && $record->wing) {
+                                        $buildingCampus = $record->wing->building->campus;
+                                        $set('campus', $buildingCampus);
+                                    }
+                                })
+                                ->placeholder('Select a campus'),
+
+                            // Campo para seleccionar el edificio (filtrado por sede)
+                            Forms\Components\Select::make('building_id')
+                                ->label('Building')
+                                ->options(fn (Get $get): Collection => Building::query()
+                                                ->where('campus', $get('campus'))
+                                                ->pluck('name', 'id')
+                                )->searchable()
+                                ->preload()
+                                ->live() // Reactivo para cambiar las alas disponibles
+                                ->required()
+                                ->afterStateUpdated(function (Set $set) 
+                                    { 
+                                        $set('wing_id', null);
+                                    }
+                                )
+                                ->afterStateHydrated(function (Set $set, $record) {
+                                    if ($record && $record->wing) {
+                                        $buildingName = $record->wing->building->name;
+                                        $set('building_id', $buildingName);
+                                    }
+                                })
+                                ->placeholder('Select a building'),
+                    Forms\Components\Select::make('wing_id')
+                        ->required()
+                        ->relationship('wing', 'name')
+                        ->options(fn (Get $get): Collection => Wing::query()
+                                    ->where('building_id', $get('building_id'))
+                                    ->pluck('name', 'id')
+                                    )
+                        ->searchable()
+                        ->preload()
+                        ->live(),
+                    ])->collapsible()
+                    ->columns(2),
             ]);
     }
 

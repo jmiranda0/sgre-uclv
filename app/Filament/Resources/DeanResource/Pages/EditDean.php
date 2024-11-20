@@ -19,7 +19,9 @@ class EditDean extends EditRecord
     }
     function mutateFormDataBeforeSave(array $data): array
     {
-    
+        if($data['existing_P']){
+            return $data;
+        }
         // buscar el profesor con el dni del formulario
         $professor = Professor::where('dni',$data['professor']['dni'])->first();
         // actualizar el profesor encontrado con los datos del formulario

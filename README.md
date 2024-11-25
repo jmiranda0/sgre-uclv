@@ -21,7 +21,7 @@ El sistema está diseñado para ser escalable, fácil de usar y capaz de adaptar
   Implementación de roles específicos como estudiantes, supervisores y administradores utilizando el paquete Spatie Permissions. Cada usuario tiene acceso restringido según sus privilegios.  
 
 - **Cuartelerías Dinámicas**  
-  Supervisión, creación y evaluación de turnos asignados a estudiantes. Los supervisores pueden agregar comentarios y evaluaciones después de cada turno.  
+  Supervisión, creación y evaluación de turnos asignados a estudiantes.  
 
 - **Interfaz de Usuario Intuitiva**  
   Basada en Filament, ofrece una experiencia moderna y funcional que simplifica la gestión de recursos.  

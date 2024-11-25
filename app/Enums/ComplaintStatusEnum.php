@@ -3,9 +3,9 @@ namespace App\Enums;
 
 enum ComplaintStatusEnum: string
 {
-    case PENDING = 'pending';
-    case REVIEWED = 'reviewed';
-    case RESOLVED = 'resolved';
+    case PENDING = 'Pendiente';
+    case REVIEWED = 'Revisado';
+    case RESOLVED = 'Solucionados';
 
     public static function getValues(): array
     {

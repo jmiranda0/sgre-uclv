@@ -32,6 +32,14 @@ class GroupAdvisorResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $label = 'Profesor Gía';
+
+    protected static ?string $pluralLabel = 'Profesores Gía';
+
+    protected static ?string $navigationGroup = 'Recursos humanos';
+
+    protected static ?int $navigationSort = 5;
+
     public static function canAccess(): bool
     {
         return auth()->user()->hasRole('GM') || auth()->user()->hasRole('Faculty_Dean');
@@ -50,7 +58,7 @@ class GroupAdvisorResource extends Resource
                         ->schema([    
                             Forms\Components\TextInput::make('professor.name')
                                 ->required()
-                                ->label('Name')
+                                ->label('Nombre')
                                 ->reactive()
                                 ->afterStateHydrated(function (Set $set, $record) {
                                     if ($record && $record->professor) {
@@ -61,6 +69,7 @@ class GroupAdvisorResource extends Resource
                                 ->visible(fn (callable $get) => !$get('existing_P')),
                             Forms\Components\TextInput::make('professor.dni')
                                 ->required()
+                                ->label('CI')
                                 ->reactive()
                                 ->afterStateUpdated(function (callable $set, $state) {
                                     $existingdni = Professor::where('dni', $state)->first();
@@ -82,6 +91,8 @@ class GroupAdvisorResource extends Resource
                                 
                             Forms\Components\Select::make('professor_id')
                                 ->relationship('professor', 'name')
+                                ->label('Profesor')
+                                ->label('Selecciona un profesor')
                                 ->options(function () { 
                                     // Aquí obtienes a los profesores que no están asociados
                                     return Professor::whereDoesntHave('yearleadprofessor') // Asegúrate de que no están en la tabla de PPAs
@@ -98,7 +109,7 @@ class GroupAdvisorResource extends Resource
                                 ->required()
                                 ->columnSpanFull(),
                             Forms\Components\Toggle::make('existing_P')
-                                ->label('Existing Professor')
+                                ->label('Profesor existente')
                                 ->reactive(),
                         ])
                             ->collapsible()
@@ -106,44 +117,45 @@ class GroupAdvisorResource extends Resource
                     
 
 
+                    Forms\Components\Section::make('Asignación del grupo')
+                        ->schema([              
+                            Forms\Components\Select::make('career_id')
+                                ->label('Carrera')
+                                ->placeholder('Selecciona la carrera')
+                                ->options(Career::all()->pluck('name', 'id'))
+                                ->searchable()
+                                ->preload()
+                                ->live()
+                                ->afterStateUpdated(fn(Set $set) => $set('career_year_id', null)) 
+                                ->afterStateHydrated(function (Set $set, $record) {
+                                    if ($record && $record->group) {
+                                        $careername = $record->group->careerYear->career->name;
+                                        $set('career_id', $careername);
+                                    }
+                                }),
+                            Forms\Components\Select::make('career_year_id')
+                                ->label('Año académico')
+                                ->options(fn (Get $get): Collection => CareerYear::query()
+                                                        ->where('career_id', $get('career_id'))
+                                                        ->pluck('name','id')
+                                                )
+                                ->searchable()
+                                ->preload()
+                                ->live()
+                                ->placeholder('Selecciona el año académico'),
 
-                    
-                    Forms\Components\Select::make('career_id')
-                        ->label('career')
-                        ->placeholder('Select a career')
-                        ->options(Career::all()->pluck('name', 'id'))
-                        ->searchable()
-                        ->preload()
-                        ->live()
-                        ->afterStateUpdated(fn(Set $set) => $set('career_year_id', null)) 
-                        ->afterStateHydrated(function (Set $set, $record) {
-                            if ($record && $record->group) {
-                                $careername = $record->group->careerYear->career->name;
-                                $set('career_id', $careername);
-                            }
-                        }),
-                    Forms\Components\Select::make('career_year_id')
-                        ->label('academic year')
-                        ->options(fn (Get $get): Collection => CareerYear::query()
-                                                ->where('career_id', $get('career_id'))
-                                                ->pluck('name','id')
-                                        )
-                        ->searchable()
-                        ->preload()
-                        ->live()
-                        ->placeholder('Select an acacemic year'),
-
-                    Forms\Components\Select::make('group_id')
-                    ->relationship(name:'group',titleAttribute:'group_number')
-                    ->placeholder('Select a group')
-                    ->options(fn (Get $get): Collection => Group::query()
-                                            ->where('career_year_id', $get('career_year_id'))
-                                            ->pluck('group_number','id')
-                                    )
-                    ->live()
-                    ->preload()
-                    ->required(),
-                    
+                            Forms\Components\Select::make('group_id')
+                                ->label('Grupo')
+                                ->relationship(name:'group',titleAttribute:'group_number')
+                                ->placeholder('Selecciona el grupo')
+                                ->options(fn (Get $get): Collection => Group::query()
+                                                        ->where('career_year_id', $get('career_year_id'))
+                                                        ->pluck('group_number','id')
+                                                )
+                                ->live()
+                                ->preload()
+                                ->required(),
+                        ])    
             ]);
     }
 
@@ -152,32 +164,27 @@ class GroupAdvisorResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('professor.name')
+                    ->label('Profesor Gía')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('group.group_number')
+                    ->label('Grupo')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->tooltip('View Group Advisor')
+                    ->tooltip('Ver Profesor Gía')
                     ->label('')
                     ->size('xl'),
                 Tables\Actions\EditAction::make()
-                    ->tooltip('Edit Group Advisor')
+                    ->tooltip('Editar Profesor Gía')
                     ->label('')
                     ->size('xl'),
                 Tables\Actions\DeleteAction::make()
-                    ->tooltip('Delete Group Advisor')
+                    ->tooltip('Eliminar Profesor Gía')
                     ->label('')
                     ->size('xl'),
             ])

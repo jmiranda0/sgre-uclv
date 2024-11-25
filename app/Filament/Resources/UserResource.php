@@ -20,6 +20,8 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $label = 'Usuarios';
+
     public static function canAccess(): bool
     {
         return auth()->user()->hasRole('GM') ;
@@ -30,16 +32,17 @@ class UserResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
-                    ->email()
+                    ->label('Correo')
                     ->required()
                     ->maxLength(255),
                 
                 // Selector de roles
                 Forms\Components\Select::make('roles')
-                    ->label('Roles')
+                    ->label('Rol')
                     ->relationship('roles', 'name')
                     ->options(Role::all()->pluck('name', 'id')->toArray())
                     ->preload()
@@ -61,20 +64,13 @@ class UserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->label('Correo')
                     ->searchable(),
-                
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('roles.name')
-                    ->label('Role')
+                    ->label('Rol')
                     ->formatStateUsing(fn ($state) => $state ? $state : '-'),   
             ])
             ->filters([
@@ -82,15 +78,15 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                ->tooltip('View User')
+                ->tooltip('Ver Usuario')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
-                ->tooltip('Edit User')
+                ->tooltip('Editar Usuario')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\DeleteAction::make()
-                ->tooltip('Delete User')
+                ->tooltip('Eliminar Usuario')
                 ->label('')
                 ->size('xl'),
             ])

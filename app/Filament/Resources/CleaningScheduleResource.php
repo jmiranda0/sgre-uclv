@@ -31,6 +31,12 @@ class CleaningScheduleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
 
+    protected static ?string $label = 'Cuartelería';
+
+    protected static ?string $pluralLabel = 'Cuartelerías';
+
+    protected static ?int $navigationSort = 3;
+
     // public static function canAccess(): bool
     // {
     //     return auth()->user()->hasRole('GM') || auth()->user()->hasRole('Faculty_Dean') || auth()->user()->hasRole('Residence_Manager');
@@ -62,13 +68,13 @@ class CleaningScheduleResource extends Resource
         return $form
             ->schema([
                 Forms\Components\DatePicker::make('cleaning_date')
-                    ->label('Schedules day')
+                    ->label('Día de la cuartelería')
                     ->required(),
                     // ->afterStateUpdated(function($record){
                     //     dd($record->students->pivot);
                     // }),
                     Forms\Components\Select::make('student_id')
-                        ->label('Assigned Students')
+                        ->label('Estudiantes asignados')
                         ->relationship('students', 'name')
                         ->multiple()
                         ->searchable() // Permite buscar estudiantes
@@ -79,7 +85,21 @@ class CleaningScheduleResource extends Resource
                                 ? Student::whereHas('room', fn ($query) => $query->where('wing_id', auth()->user()->professor->wingsupervisor->wing->id))
                                     ->pluck('name', 'id')
                                 : Student::pluck('name', 'id');
-                        })
+                        })->hiddenOn('edit'), // Solo visible en la creación
+                    Forms\Components\Repeater::make('students') // Para edición de comentarios
+                        ->relationship('students') // Relación configurada
+                        ->schema([
+                            Forms\Components\TextInput::make('name')
+                                ->label('Nombre del estudiante')
+                                ->disabled(), // Solo lectura
+                            Forms\Components\Textarea::make('pivot.comment')
+                                ->label('Comentario')
+                                ->rows(3)
+                                ->helperText('Escriba notas relacionadas con el estudiante.')
+                                ->visible(auth()->user()->hasRole('Wing_Supervisor')), // Solo para supervisores
+                    ])
+                    ->columns(2)
+                    ->hiddenOn('create')
 
             ]);
     }
@@ -89,11 +109,11 @@ class CleaningScheduleResource extends Resource
         return $table
         ->columns([
             TextColumn::make('cleaning_date')
-                ->label('Schedules day')
+                ->label('Día de la cuartelería')
                 ->sortable()
                 ->alignCenter(),
                 Tables\Columns\TextColumn::make('students_count')
-                ->label('Students Assigned')
+                ->label('Estudiantes asignados')
                 ->counts('students') // Muestra la cantidad de estudiantes asignados
                 ->alignCenter(),
                 
@@ -103,15 +123,15 @@ class CleaningScheduleResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                ->tooltip('View sheldules day')
+                ->tooltip('Ver cuartelería')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
-                ->tooltip('Edit sheldules day')
+                ->tooltip('Editar cuartelería')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\DeleteAction::make()
-                ->tooltip('Delete sheldues day')
+                ->tooltip('Eliminar Cuartelería')
                 ->label('')
                 ->size('xl'),
             ])
@@ -121,19 +141,19 @@ class CleaningScheduleResource extends Resource
                 ]),
             ]);
     }
-    public static function infolist(Infolist $infolist):Infolist
-    {
-            return $infolist
-            ->schema([
-                TextEntry::make('cleaning_date')
-                ->label('Schedules day'),
-                Section::make()
-                ->schema([
-                    RepeatableEntry::make('student')
-                        
-                ])
-            ]);
-    }
+    // public static function infolist(Infolist $infolist):Infolist
+    // {
+    //         return $infolist
+    //         ->schema([
+                
+    //             InfolistItem::make('Fecha de la Limpieza')
+    //                 ->value(fn (CleaningSchedule $record) => $record->cleaning_date->format('d/m/Y')),
+    //             InfolistItem::make('Estudiantes Asignados')
+    //                 ->value(fn (CleaningSchedule $record) => $record->students->map(function ($student) {
+    //                     return $student->name . ' - Evaluación: ' . $student->pivot->evaluation;
+    //                 })->implode(', ')),
+    //         ]);
+    // }
     public static function getRelations(): array
     {
         return [

@@ -26,6 +26,14 @@ class DeanResource extends Resource
     protected static ?string $model = Dean::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $label = 'Decano';
+
+    protected static ?string $pluralLabel = 'Decanos';
+
+    protected static ?string $navigationGroup = 'Recursos humanos';
+
+    protected static ?int $navigationSort = 3;
     
     public static function canAccess(): bool
     {
@@ -41,7 +49,7 @@ class DeanResource extends Resource
                     ->schema([    
                             Forms\Components\TextInput::make('professor.name')
                                 ->required()
-                                ->label('Name')
+                                ->label('Nombre')
                                 ->reactive()
                                 ->afterStateHydrated(function (Set $set, $record) {
                                     if ($record && $record->professor) {
@@ -52,6 +60,7 @@ class DeanResource extends Resource
                                 ->visible(fn (callable $get) => !$get('existing_P')),
 
                             Forms\Components\TextInput::make('professor.dni')
+                                ->label('CI')
                                 ->required()
                                 ->reactive()
                                 ->afterStateUpdated(function (callable $set, $state) {
@@ -74,6 +83,8 @@ class DeanResource extends Resource
                                 
                             Forms\Components\Select::make('professor_id')
                                 ->relationship('professor', 'name')
+                                ->label('Profesor')
+                                ->placeholder('Seleccione un profesor')
                                 ->options(function () { 
                                     // Aquí obtienes a los profesores que no están asociados
                                     return Professor::whereDoesntHave('yearleadprofessor') // Asegúrate de que no están en la tabla de PPAs
@@ -91,7 +102,7 @@ class DeanResource extends Resource
                                 ->columnSpanFull(),
 
                             Forms\Components\Toggle::make('existing_P')
-                                ->label('Existing Professor')
+                                ->label('Profesor existente')
                                 ->reactive(),
                         ])
                         ->collapsible()
@@ -99,6 +110,8 @@ class DeanResource extends Resource
                 Forms\Components\Section::make('Asignación de facultad')
                     ->schema([    
                             Forms\Components\Select::make('faculty_id')
+                            ->label('Facultad')
+                            ->placeholder('Seleccione una facultad')
                             ->relationship('faculty', 'name')
                             ->required(),
                     ])
@@ -111,34 +124,26 @@ class DeanResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('professor.name')
-                  
+                    ->label('Decano')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('faculty.name')
-                    
+                    ->label('Facultad')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                ->tooltip('View Dean')
+                ->tooltip('Ver Decano')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
-                ->tooltip('Edit Dean')
+                ->tooltip('Editar Decano')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\DeleteAction::make()
-                ->tooltip('Delete Dean')
+                ->tooltip('Eliminar Decano')
                 ->label('')
                 ->size('xl'),
             ])
@@ -156,11 +161,11 @@ class DeanResource extends Resource
                 Section::make('Information')
                     ->schema([
                         TextEntry::make('professor.name')
-                            ->label('Name'),  
+                            ->label('Nombre'),  
                         TextEntry::make('professor.dni')
-                            ->label('Dni'), 
+                            ->label('CI'), 
                         TextEntry::make('faculty.name')
-                            ->label('Faculty'),
+                            ->label('Facultad'),
                     ])->columns(2)
             ]);
     }

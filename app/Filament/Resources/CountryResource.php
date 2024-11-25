@@ -19,7 +19,11 @@ class CountryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
 
-    protected static ?string $navigationGroup = 'Locality Management';
+    protected static ?string $label = 'País';
+    
+    protected static ?string $pluralLabel = 'Paíces';
+
+    protected static ?string $navigationGroup = 'Gestión de localidad';
 
     protected static ?int $navigationSort = 6;
 
@@ -33,7 +37,7 @@ class CountryResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->label('Country Name')
+                    ->label('Nombre del país')
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
@@ -45,31 +49,24 @@ class CountryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Country Name')
+                    ->label('Nombre del país')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+               
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                ->tooltip('View Country')
+                ->tooltip('Ver país')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
-                ->tooltip('Edit Country')
+                ->tooltip('Editar país')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\DeleteAction::make()
-                ->tooltip('Delete Country')
+                ->tooltip('Eliminar país')
                 ->label('')
                 ->size('xl'),
             ])

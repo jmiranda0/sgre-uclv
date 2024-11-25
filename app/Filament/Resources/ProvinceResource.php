@@ -19,7 +19,11 @@ class ProvinceResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-map';
 
-    protected static ?string $navigationGroup = 'Locality Management';
+    protected static ?string $label = 'Provincia';
+    
+    protected static ?string $pluralLabel = 'Provincias';
+
+    protected static ?string $navigationGroup = 'Gestión de localidad';
     
     protected static ?int $navigationSort = 4;
 
@@ -33,6 +37,7 @@ class ProvinceResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Provincia')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -43,30 +48,24 @@ class ProvinceResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Provincia')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                ->tooltip('View Province')
+                ->tooltip('Ver Provincia')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
-                ->tooltip('Edit Province')
+                ->tooltip('Editar Provincia')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\DeleteAction::make()
-                ->tooltip('Delete Province')
+                ->tooltip('Eliminar Provincia')
                 ->label('')
                 ->size('xl'),
             ])

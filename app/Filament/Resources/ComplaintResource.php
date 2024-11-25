@@ -29,6 +29,11 @@ class ComplaintResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $label = 'Queja/Planteamiento';
+
+    protected static ?string $pluralLabel = 'Quejas/Planteamientos';
+
+    protected static ?int $navigationSort = 2;
     
     public static function canAccess(): bool
     {
@@ -52,15 +57,15 @@ class ComplaintResource extends Resource
         return $form
         ->schema([
                 Forms\Components\TextInput::make('theme')
-                    ->label('Theme')
+                    ->label('Asunto')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Textarea::make('text')
-                    ->label('Details')
+                    ->label('Detalles del asunto')
                     ->required()
                     ->columnSpanFull(),
                 Forms\Components\Select::make('status')
-                    ->label('Status')
+                    ->label('Estado')
                     ->hidden(auth()->user()->hasRole('Student'))
                     ->options(array_combine(ComplaintStatusEnum::getValues(), ComplaintStatusEnum::getValues()))
                     ->required(),
@@ -76,52 +81,48 @@ class ComplaintResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('theme')
-                    ->label('Theme')
+                    ->label('Asunto')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Status')
+                    ->label('Estado')
                     ->badge()
                     ->color(fn ($state) => match ($state->value) {
-                        'pending' => 'danger',
-                        'reviewed' => 'warning',
-                        'resolved' => 'success',
-                        //'rejected' => 'danger',
+                        'Pendiente' => 'danger',
+                        'Revisado' => 'warning',
+                        'Solucionados' => 'success',
                     })
                     ->formatStateUsing(fn ($state) => ucfirst($state->value)),
                 Tables\Columns\TextColumn::make('student.name')
-                    ->label('Student Name')
+                    ->label('Nombre del estudiante')
                     ->getStateUsing(fn ($record) => $record->student->name . ' ' . $record->student->last_name)
                     ->sortable()
                     ->hidden(auth()->user()->hasRole('Student')),
                 Tables\Columns\TextColumn::make('student.room.wing.building.name')
-                    ->label('Building')
+                    ->label('Edificio')
                     ->sortable()
                     ->hidden(auth()->user()->hasRole('Student')),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Created At')
-                    ->dateTime()
-                    ->sortable(),
+                
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
-                    ->label('Status')
+                    ->label('Estado')
                     ->options(array_combine(ComplaintStatusEnum::getValues(), ComplaintStatusEnum::getValues())),
             ])
             ->actions([
                 
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make()
-                        ->label('View Complaint')
+                        ->label('Ver planteamiento')
                         ->size('xl')
                         ->iconPosition(IconPosition::After->value),
                     Tables\Actions\EditAction::make()
                         ->hidden(auth()->user()->hasRole('Student'))
-                        ->label('Edit Complaint')
+                        ->label('Editar planteamiento')
                         ->size('xl')
                         ->iconPosition(IconPosition::After),
                     Tables\Actions\DeleteAction::make()
                         ->hidden(auth()->user()->hasRole('Student'))
-                        ->label('Delete Complaint')
+                        ->label('Eliminar planteamiento')
                         ->size('xl')
                         ->iconPosition(IconPosition::After),
                 ]),
@@ -129,14 +130,14 @@ class ComplaintResource extends Resource
 
                 Tables\Actions\ActionGroup::make([  
                     Tables\Actions\Action::make('markReviewed')
-                        ->label('Mark as Reviewed')
+                        ->label('Marcar como revisado')
                         ->visible(auth()->user()->hasRole('Residence_Manager'))
                         ->action(fn ($record) => $record->update(['status' => ComplaintStatusEnum::REVIEWED->value]))
                         ->requiresConfirmation()
                         ->color('warning')
                         ->icon('heroicon-o-check'),
                     Tables\Actions\Action::make('markResolved')
-                        ->label('Mark as Resolved')
+                        ->label('Marcar como solucionado')
                         ->visible(auth()->user()->hasRole('Residence_Manager'))
                         ->action(fn ($record) => $record->update(['status' => ComplaintStatusEnum::RESOLVED->value]))
                         ->requiresConfirmation()
@@ -161,37 +162,37 @@ class ComplaintResource extends Resource
             Tabs::make('Tabs')
                     ->tabs([    
                         // Aquí defines los detalles de la queja con el esquema que desees
-                        Tab::make('Complaint')
+                        Tab::make('Planteamiento')
                             ->schema([
                                 TextEntry::make('theme')
-                                    ->label('Theme'),      
+                                    ->label('Asunto'),      
                                 TextEntry::make('status')
-                                    ->label('Status')
+                                    ->label('Estado')
                                     ->formatStateUsing(fn ($state) => ucfirst($state->value))
                                     ->badge()
                                     ->color(fn ($state) => match ($state->value) {
-                                        'pending' => 'danger',
-                                        'reviewed' => 'warning',
-                                        'resolved' => 'success',
+                                        'Pendiente' => 'danger',
+                                        'Revisado' => 'warning',
+                                        'Solucionados' => 'success',
                                         //'rejected' => 'danger',
                                     }),
                                 TextEntry::make('text')
-                                    ->label('Details')
+                                    ->label('Detalles del asunto')
                                     ->columnSpanFull(),
                             ])->columns(2),
-                        Tab::make('Student')
+                        Tab::make('Estudiante')
                             ->schema([
                                 TextEntry::make('studentName')
-                                    ->label('Student Name')
+                                    ->label('Nombre del estudiante')
                                     ->getStateUsing(fn ($record) => $record->student->name . ' ' . $record->student->last_name),
                                 TextEntry::make('student.dni')
                                     ->label('DNI'),
                                 TextEntry::make('student.room.wing.building.name')
-                                    ->label('Building'),
+                                    ->label('Edificio'),
                                 TextEntry::make('student.room.wing.name')
-                                    ->label('Wing'),
+                                    ->label('Ala'),
                                 TextEntry::make('student.room.number')
-                                    ->label('Room'),
+                                    ->label('Cuarto'),
                                 
                             ])->columns(2),
                     ])->columnSpanFull() 

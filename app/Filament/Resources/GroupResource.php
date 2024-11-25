@@ -25,7 +25,11 @@ class GroupResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Academic Management';
+    protected static ?string $label = 'Grupo';
+    
+    protected static ?string $pluralLabel = 'Grupos';
+
+    protected static ?string $navigationGroup = 'Gestión Académica';
     
     protected static ?int $navigationSort = 10;
 
@@ -48,10 +52,12 @@ class GroupResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('group_number')
+                    ->label('Grupo')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('faculty_id')
-                    ->label('Faculty')
+                    ->label('Facultad')
+                    ->placeholder('Selecciona una facultad')
                     ->options(Faculty::all()->pluck('name', 'id')) // Consulta de facultad
                     ->searchable()
                     ->preload()
@@ -64,7 +70,7 @@ class GroupResource extends Resource
                         }
                     }),
                 Forms\Components\Select::make('career_id')
-                    ->label('Career')
+                    ->label('Carrera')
                     ->searchable()
                     ->preload()
                     ->live()
@@ -74,7 +80,7 @@ class GroupResource extends Resource
                             )
                     ->afterStateUpdated(fn(Set $set) => $set('career_year_id', null))
                     
-                    ->placeholder('Select a career')
+                    ->placeholder('Selecciona una carrera')
                     ->afterStateHydrated(function (Set $set, $record) {
                         if ($record && $record->careeryear) {
                             $careername = $record->careeryear->career->name;
@@ -83,7 +89,7 @@ class GroupResource extends Resource
                     }),
                 Forms\Components\Select::make('career_year_id')
                     ->required()
-                    ->label('Academic Year')
+                    ->label('Año académico')
                     ->relationship(name:'careerYear', titleAttribute:'name')
                     ->preload()
                     ->searchable()
@@ -92,7 +98,7 @@ class GroupResource extends Resource
                                     ->where('career_id', $get('career_id'))
                                     ->pluck('name','id')
                             )
-                    ->placeholder('Select a academic year')
+                    ->placeholder('Selecciona el año académico')
                     ->afterStateHydrated(function (Set $set, $record) {
                         if ($record && $record->careeryear) {
                             $careeryearname = $record->careeryear->name;
@@ -107,19 +113,13 @@ class GroupResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('group_number')
+                    ->label('Grupo')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('careerYear.career.name')
-                    ->label('Career')
+                    ->label('Carrera')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                
             ])
             ->filters([
                 //

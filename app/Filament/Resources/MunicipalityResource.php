@@ -19,7 +19,11 @@ class MunicipalityResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-map-pin';
 
-    protected static ?string $navigationGroup = 'Locality Management';
+    protected static ?string $label = 'Municipio';
+    
+    protected static ?string $pluralLabel = 'Municipios';
+
+    protected static ?string $navigationGroup = 'Gestión de localidad';
 
     protected static ?int $navigationSort = 5;
 
@@ -33,9 +37,12 @@ class MunicipalityResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Municipio')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('province_id')
+                    ->label('Provincia')
+                    ->placeholder('Seleccione una provincia')
                     ->relationship('province', 'name')
                     ->required(),
             ]);
@@ -46,30 +53,24 @@ class MunicipalityResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Municipio')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                ->tooltip('View Municipality')
+                ->tooltip('Ver Municipio')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
-                ->tooltip('Edit Municipality')
+                ->tooltip('Editar Municipio')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\DeleteAction::make()
-                ->tooltip('Delete Municipality')
+                ->tooltip('Eliminar Municipio')
                 ->label('')
                 ->size('xl'),
             ])

@@ -15,35 +15,41 @@ class CreateYearLeadProfessor extends CreateRecord
     protected static string $resource = YearLeadProfessorResource::class;
     
     protected function mutateFormDataBeforeCreate(array $data): array
-{
-    if($data['existing_P']){
+    {
+        if($data['existing_P']){
+            return $data;
+        }
+        // Comprobar si el DNI ya existe
+        if (Professor::where('dni', $data['professor']['dni'])->exists()) {
+            // Notificar al usuario
+            Notification::make()
+                ->title('DNI Duplicated')
+                ->body('The DNI you entered is already in use. Please change it.')
+                ->warning()
+                ->persistent()
+                ->send();
+
+            // Lanzar una excepción de validación para detener el proceso
+            throw ValidationException::withMessages([
+                'professor.dni' => 'The DNI already exists. Please enter a unique value.',
+            ]);
+        }
+
+        // Crear el profesor
+        $professor = Professor::create([
+            'name' => $data['professor']['name'],
+            'dni' => $data['professor']['dni'],
+        ]);
+
+        // Asignar el professor_id al decano
+        $data['professor_id'] = $professor->id;
+
         return $data;
     }
-    // Comprobar si el DNI ya existe
-    if (Professor::where('dni', $data['professor']['dni'])->exists()) {
-        // Notificar al usuario
-        Notification::make()
-            ->title('DNI Duplicated')
-            ->body('The DNI you entered is already in use. Please change it.')
-            ->warning()
-            ->persistent()
-            ->send();
 
-        // Lanzar una excepción de validación para detener el proceso
-        throw ValidationException::withMessages([
-            'professor.dni' => 'The DNI already exists. Please enter a unique value.',
-        ]);
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
-
-    // Crear el profesor
-    $professor = Professor::create([
-        'name' => $data['professor']['name'],
-        'dni' => $data['professor']['dni'],
-    ]);
-
-    // Asignar el professor_id al decano
-    $data['professor_id'] = $professor->id;
-
-    return $data;
-}
+    
 }

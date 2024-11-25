@@ -19,7 +19,11 @@ class CareerResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-newspaper';
 
-    protected static ?string $navigationGroup = 'Academic Management';
+    protected static ?string $label = 'Carrera';
+    
+    protected static ?string $pluralLabel = 'Carreras';
+
+    protected static ?string $navigationGroup = 'Gestión Académica';
     
     protected static ?int $navigationSort = 8;
 
@@ -40,15 +44,16 @@ class CareerResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('faculty_id')
-                    ->label('Faculty')
+                    ->label('Facultad')
                     ->relationship(name: 'faculty', titleAttribute: 'name') // Consulta de países
                     ->searchable()
                     ->preload()
                     ->live()
-                    ->placeholder('Select a faculty'),
+                    ->placeholder('Selecciona una facultad'),
 
             ]);
     }
@@ -58,31 +63,23 @@ class CareerResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label("Career's Name")
+                    ->label("Nombre de la carrera")
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                ->tooltip('View Career')
+                ->tooltip('Ver Carrera')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
-                ->tooltip('Edit Career')
+                ->tooltip('Editar Carrera')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\DeleteAction::make()
-                ->tooltip('Delete Career')
+                ->tooltip('Eliminar Carrera')
                 ->label('')
                 ->size('xl'),
             ])

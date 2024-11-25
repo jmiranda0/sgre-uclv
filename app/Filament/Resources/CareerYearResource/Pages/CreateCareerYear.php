@@ -9,4 +9,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateCareerYear extends CreateRecord
 {
     protected static string $resource = CareerYearResource::class;
+    
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

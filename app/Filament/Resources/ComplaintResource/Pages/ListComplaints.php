@@ -21,6 +21,10 @@ class ListComplaints extends ListRecords
     }
     protected function getHeaderWidgets(): array
 {
+    if (auth()->user()->hasRole('Student'))
+        return [];    
+
+
     return [
         ComplaintStats::class,
     ];

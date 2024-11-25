@@ -20,7 +20,9 @@ class RoomResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-key';
 
-    protected static ?string $navigationGroup = 'Scolarship Management';
+    protected static ?string $label = 'Cuartos';
+
+    protected static ?string $navigationGroup = 'Control de recidencias';
 
     protected static ?int $navigationSort = 3;
 
@@ -42,14 +44,18 @@ class RoomResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('number')
+                    ->label('Número del cuarto')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('room_capacity')
+                    ->label('Capacidad del cuarto')
                     ->required()
                     ->numeric(),
                 Forms\Components\Toggle::make('is_available')
+                    ->label('Disponible')
                     ->required(),
                 Forms\Components\Select::make('wing_id')
+                    ->placeholder('Sleleccione el ala')
                     ->relationship('wing', 'name')
                     ->hidden(fn () => auth()->user()->hasRole('Wing_Supervisor'))
                     ->required(),
@@ -62,21 +68,26 @@ class RoomResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('wing.building.name')
                     ->hidden(fn () => auth()->user()->hasRole('Wing_Supervisor'))
+                    ->label('Edificio')
                     ->searchable()
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('wing.name')
                     ->hidden(fn () => auth()->user()->hasRole('Wing_Supervisor'))
+                    ->label('Ala')
                     ->sortable()
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('number')
+                    ->label('Cuarto')
                     ->searchable()
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('room_capacity')
+                    ->label('Capacidad del cuarto')
                     ->numeric()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false)
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('students_count')
+                    ->label('Cantidad de estudiantes')
                     ->counts('students')
                     ->getStateUsing(function ($record) {
                         return $record->students_count > 0 ? $record->students_count < $record->room_capacity ? $record->students_count: 'the room is full' : 'No students';
@@ -85,33 +96,25 @@ class RoomResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: false)
                     ->alignCenter(),
                 Tables\Columns\IconColumn::make('is_available')
+                    ->label('Disponible')
                     ->boolean()
                     ->alignCenter(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->alignCenter(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->alignCenter(),
+                
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                ->tooltip('View Room')
+                ->tooltip('Ver cuarto')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
-                ->tooltip('Edit Room')
+                ->tooltip('Editar cuarto')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\DeleteAction::make()
-                ->tooltip('Delete Room')
+                ->tooltip('Eliminar cuarto')
                 ->label('')
                 ->size('xl'),
             ])

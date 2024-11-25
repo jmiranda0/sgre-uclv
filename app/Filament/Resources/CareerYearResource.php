@@ -24,7 +24,11 @@ class CareerYearResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
 
-    protected static ?string $navigationGroup = 'Academic Management';
+    protected static ?string $label = 'Año académico';
+    
+    protected static ?string $pluralLabel = 'Años académicos';
+
+    protected static ?string $navigationGroup = 'Gestión Académica';
     
     protected static ?int $navigationSort = 9;
 
@@ -47,15 +51,17 @@ class CareerYearResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->label('Academic year')
+                    ->label('Año académico')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\DatePicker::make('year')
+                    ->label('Año')
                     ->unique()
                     ->required(),
                 Forms\Components\Select::make('faculty_id')
-                ->label('Faculty')
+                ->label('Facultad')
                 ->options(Faculty::all()->pluck('name', 'id')) // Consulta de facultad
+                ->placeholder('Seleccione una Facultad')
                 ->searchable()
                 ->preload()
                 ->live() 
@@ -67,6 +73,8 @@ class CareerYearResource extends Resource
                     }
                 }),
                 Forms\Components\Select::make('career_id')
+                    ->label('Carrera')
+                    ->placeholder('Seleccione una carrera')
                     ->preload()
                     ->searchable()
                     ->live()

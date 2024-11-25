@@ -37,6 +37,12 @@ class StudentResource extends Resource
     protected static ?string $model = Student::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
+
+    protected static ?string $label = 'Estudiante';
+
+    protected static ?string $pluralLabel = 'Estudiantes';
+
+    protected static ?int $navigationSort = 1;
     
     public static function canAccess(): bool
     {
@@ -54,27 +60,31 @@ class StudentResource extends Resource
 {
     return $form
         ->schema([
-            Section::make('Personal Information')
+            Section::make('Información Personal')
                 ->schema([
                     Forms\Components\TextInput::make('name')
+                        ->label('Nombre')
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('last_name')
+                        ->label('Apellido')
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('dni')
                         ->required()
+                        ->label('CI')
                         ->unique('students', 'dni', ignoreRecord: true)
                         ->maxLength(11)
                         ->rules(['digits:11', 'regex:/^[0-9]{11}$/'])
                         ,
                     Forms\Components\TextInput::make('scholarship_card')
+                        ->label('Carnet de Estudiante')
                         ->required()
                         ->unique('students', 'scholarship_card', ignoreRecord: true)
                         ->maxLength(255),
                     // Toggle para determinar si es extranjero
                     Forms\Components\Toggle::make('is_foreign')
-                        ->label('Is Foreign')
+                        ->label('Es extrangero')
                         ->required()
                         ->live() // Reactivo para cambiar los campos visibles
                         ->afterStateUpdated(function (callable $set, $state) {
@@ -85,26 +95,27 @@ class StudentResource extends Resource
 
                 ])->columns(2),
             
-            Section::make('Locality')
+            Section::make('Localidad')
                 ->schema([
                         
                         // Campo de selección para el país (visible si es extranjero)
                         Forms\Components\Select::make('country_id')
-                            ->label('Country')
+                            ->label('País')
                             ->relationship(name: 'country', titleAttribute: 'name') // Consulta de países
                             ->searchable()
                             ->preload()
                             ->live()
                             ->visible(fn (callable $get) => $get('is_foreign')) // Solo se muestra si es extranjero
-                            ->placeholder('Select a country')
+                            ->placeholder('Selecciona el país')
                             ->columnSpanFull(),
 
                         // Campo de selección para la provincia (visible si no es extranjero)
                         Forms\Components\Select::make('province_id')
-                            ->label('Province')
+                            ->label('Provincia')
                             ->options(Province::all()->pluck('name', 'id')) // Consulta de provincias
                             ->searchable()
                             ->preload()
+                            ->label('Selecciona la provincia')
                             ->live() 
                             ->afterStateUpdated(fn(Set $set) => $set('municipality_id', null))
                             ->afterStateHydrated(function (Set $set, $record) {
@@ -118,7 +129,7 @@ class StudentResource extends Resource
                         
                         // Campo de selección para el municipio, filtrado por provincia
                         Forms\Components\Select::make('municipality_id')
-                            ->label('Municipality')
+                            ->label('Municipio')
                             ->relationship(name: 'municipality', titleAttribute: 'name')
                             ->searchable()
                             ->preload()
@@ -127,15 +138,15 @@ class StudentResource extends Resource
                                             ->pluck('name','id')
                                     )
                             ->visible(fn (callable $get) => !$get('is_foreign')) // Visible solo si no es extranjero
-                            ->placeholder('Select a municipality'),
+                            ->placeholder('Selecciona el municipio'),
 
                 ])->columns(2),
 
-            Section::make('Academic Information')
+            Section::make('Información Academica')
                 ->schema([
                         // Campo de selección para la facultad
                         Forms\Components\Select::make('faculty_id')
-                                ->label('Faculty')
+                                ->label('Facultad')
                                 ->options(Faculty::all()->pluck('name', 'id')) // Consulta de facultad
                                 ->searchable()
                                 ->preload()
@@ -150,7 +161,7 @@ class StudentResource extends Resource
                                     ->hidden(fn () => auth()->user()->hasRole('Faculty_Dean')),
                         // Campo de selección para la carrera
                         Forms\Components\Select::make('career_id')
-                                ->label('Career')
+                                ->label('Carera')
                                 ->searchable()
                                 ->preload()
                                 ->live()
@@ -165,7 +176,7 @@ class StudentResource extends Resource
                                         )
                                 ->afterStateUpdated(fn(Set $set) => $set('career_year_id', null))
                                 
-                                ->placeholder('Select a career')
+                                ->placeholder('Selecciona una carrera')
                                 ->afterStateHydrated(function (Set $set, $record) {
                                         if ($record && $record->careeryear) {
                                             $careername = $record->careeryear->career->name;
@@ -174,7 +185,7 @@ class StudentResource extends Resource
                                 }),
                         // Campo de selección para el año academico
                         Forms\Components\Select::make('career_year_id')
-                                ->label('Academic Year')
+                                ->label('Año académico')
                                 ->preload()
                                 ->searchable()
                                 ->live()
@@ -182,7 +193,7 @@ class StudentResource extends Resource
                                                 ->where('career_id', $get('career_id'))
                                                 ->pluck('name','id')
                                         )
-                                ->placeholder('Select a academic year')
+                                ->placeholder('Selecciona el año académico')
                                 ->afterStateHydrated(function (Set $set, $record) {
                                         if ($record && $record->careeryear) {
                                             $careeryearname = $record->careeryear->name;
@@ -196,14 +207,14 @@ class StudentResource extends Resource
                                             ->where('career_year_id', $get('career_year_id'))
                                             ->pluck('group_number','id')
                                         )
-                                ->label('Group')
+                                ->label('Grupo')
                                 ->placeholder('Select a group'),
                 ]),
-            Section::make('Scolarship')
+            Section::make('Beca')
                 ->schema([
                         // Campo para seleccionar el Campus
                         Forms\Components\Select::make('campus')
-                            ->label('Campus')
+                            ->label('Cede')
                             ->options([
                                 'Universitaria' => 'Universitaria',
                                 'Félix Varela' => 'Félix Varela',
@@ -227,12 +238,12 @@ class StudentResource extends Resource
                                     $set('campus', $buildingCampus);
                                 }
                             })
-                            ->placeholder('Select a campus')
+                            ->placeholder('Seleccione la cede')
                             ->hidden(fn () => auth()->user()->hasRole('Wing_Supervisor')),
 
                         // Campo para seleccionar el edificio (filtrado por sede)
                         Forms\Components\Select::make('building_id')
-                            ->label('Building')
+                            ->label('Edificio')
                             ->options(fn (Get $get): Collection => Building::query()
                             ->where('campus', $get('campus'))
                             ->pluck('name', 'id')
@@ -253,12 +264,12 @@ class StudentResource extends Resource
                                     $set('building_id', $buildingName);
                                 }
                             })
-                            ->placeholder('Select a building')
+                            ->placeholder('Selecione el edificio')
                             ->hidden(fn () => auth()->user()->hasRole('Wing_Supervisor')),
 
                         // Campo para seleccionar el ala (filtrado por edificio)
                         Forms\Components\Select::make('wing_id')
-                            ->label('Wing')
+                            ->label('Ala')
                             ->options(fn (Get $get): Collection => Wing::query()
                                 ->where('building_id', $get('building_id'))
                                 ->pluck('name', 'id')
@@ -274,11 +285,11 @@ class StudentResource extends Resource
                                     $set('wing_id', $wingName);
                                 }
                             })
-                            ->placeholder('Select a wing')
+                            ->placeholder('Seleccione el ala')
                             ->hidden(fn () => auth()->user()->hasRole('Wing_Supervisor')),
                         // Campo para seleccionar la habitación (filtrado por ala)
                         Forms\Components\Select::make('room_id')
-                            ->label('Room')
+                            ->label('Cuarto')
                             ->relationship(name:'room', titleAttribute:'number')
                             ->options(auth()->user()->hasRole('Wing_Supervisor')?
                                         fn (): Collection => Room::query()
@@ -297,15 +308,16 @@ class StudentResource extends Resource
                             ->live()
                             ->required()
                             ->columnSpan(auth()->user()->hasRole('Wing_Supervisor')?'full':'')
-                            ->placeholder('Select a room'),
+                            ->placeholder('Selecione el cuarto')
+                            
                     
                 ])->columns(2),
-                Section::make('System Information')
+                Section::make('Información del sistema')
                 ->schema([
                         // Campo de selección para el grupo
                         Forms\Components\Select::make('user_id')
                                 ->relationship('user', 'email')
-                                ->label("User's email"),
+                                ->label("Correo del usuario"),
                 ])->hidden(fn () => !auth()->user()->hasRole('GM')),           
             
 
@@ -322,37 +334,40 @@ class StudentResource extends Resource
         return $table
         ->columns([ 
             TextColumn::make('name')
-                    ->label('Full Name')
+                    ->label('Nombre completo')
                     ->searchable()
                     ->getStateUsing(fn ($record) => $record->name . ' ' . $record->last_name)
                     ->alignCenter(),
             TextColumn::make('dni')->searchable()
+                    ->label('Ci')
                     ->alignCenter(),
             TextColumn::make('scholarship_card')->searchable()
+                    ->label('Carnet de estudiante')
                     ->alignCenter(),
-            TextColumn::make('group.id')
-                    ->label('Group')
+            TextColumn::make('group.group_number')
+                    ->label('Grupo')
                     ->sortable()
                     ->alignCenter(),
             TextColumn::make('room.wing.building.name')
-                    ->label('Building')
+                    ->label('Edificio')
                     ->searchable()
                     ->alignCenter(),
             TextColumn::make('room.wing.name')
-                    ->label('Wing')
+                    ->label('Ala')
                     ->sortable()
                     ->alignCenter(),
             TextColumn::make('room.number')
-                    ->label('Room')
+                    ->label('Cuarto')
                     ->sortable()
                     ->alignCenter(),
             // Mostrar la columna de país solo si estamos en la pestaña de extranjeros
             TextColumn::make('country.name')
-                    ->label('Country')
+                    ->label('País')
                     ->visible(false)
                     ->alignCenter(),
             // Mostrar la columna de municipio solo si estamos en la pestaña de locales
             TextColumn::make('municipality.name')
+                    ->label('Municipio')
                     ->visible(false)
                     ->alignCenter()
             
@@ -363,15 +378,15 @@ class StudentResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                ->tooltip('View Student')
+                ->tooltip('Ver estudiante')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
-                ->tooltip('Edit Student')
+                ->tooltip('Editar estudiante')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\DeleteAction::make()
-                ->tooltip('Delete Student')
+                ->tooltip('Eliminar estudiante')
                 ->label('')
                 ->size('xl'),
             ])

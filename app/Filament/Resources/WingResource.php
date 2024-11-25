@@ -19,8 +19,10 @@ class WingResource extends Resource
     protected static ?string $model = Wing::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-group';
-    
-    protected static ?string $navigationGroup = 'Building Management';
+
+    protected static ?string $label = 'Alas de los Edificios';
+
+    protected static ?string $navigationGroup = 'Control de recidencias';
 
     protected static ?int $navigationSort = 2;
 
@@ -34,10 +36,12 @@ class WingResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Ala')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('building_id')
                     ->relationship('building', 'name')
+                    ->placeholder('Seleccione un Edificio')
                     ->required(),
             ]);
     }
@@ -47,25 +51,17 @@ class WingResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Ala')
                     ->searchable()
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('building.name')
-                    ->numeric()
+                    ->label('Edificio')
                     ->sortable()
                     ->searchable()
                     ->alignCenter(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->alignCenter(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->alignCenter(),
+                
                 Tables\Columns\TextColumn::make('rooms_count')
-                    ->label('Number of Rooms')
+                    ->label('Número de cuartos del ala')
                     ->counts('rooms') // Cuenta las alas relacionadas
                     ->getStateUsing(function ($record) {
                         return $record->rooms_count > 0 ? $record->rooms_count : 'No rooms';
@@ -78,15 +74,15 @@ class WingResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                ->tooltip('View Wing')
+                ->tooltip('Ver ala')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
-                ->tooltip('Edit Wing')
+                ->tooltip('Editar ala')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\DeleteAction::make()
-                ->tooltip('Delete Wing')
+                ->tooltip('Eliminar ala')
                 ->label('')
                 ->size('xl'),
             ])

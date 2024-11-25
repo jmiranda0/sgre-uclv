@@ -24,6 +24,14 @@ class WingSupervisorResource extends Resource
     protected static ?string $model = WingSupervisor::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $label = 'Responsable de beca';
+
+    protected static ?string $pluralLabel = 'Responsables de beca';
+
+    protected static ?string $navigationGroup = 'Recursos humanos';
+    
+    protected static ?int $navigationSort = 2;
     
     public static function canAccess(): bool
     {
@@ -38,7 +46,7 @@ class WingSupervisorResource extends Resource
                     ->schema([    
                         Forms\Components\TextInput::make('professor.name')
                             ->required()
-                            ->label('Name')
+                            ->label('Nombre')
                             ->reactive()
                             ->afterStateHydrated(function (Set $set, $record) {
                                 if ($record && $record->professor) {
@@ -48,6 +56,7 @@ class WingSupervisorResource extends Resource
                             })
                             ->visible(fn (callable $get) => !$get('existing_P')),
                         Forms\Components\TextInput::make('professor.dni')
+                            ->label('CI')
                             ->required()
                             ->reactive()
                             ->afterStateUpdated(function (callable $set, $state) {
@@ -69,6 +78,8 @@ class WingSupervisorResource extends Resource
                             ->visible(fn (callable $get) => !$get('existing_P')),
                             
                         Forms\Components\Select::make('professor_id')
+                            ->label('Profesor')
+                            ->placeholder('Seleccione un profesor')
                             ->relationship('professor', 'name')
                             ->options(function () { 
                                 // Aquí obtienes a los profesores que no están asociados
@@ -95,7 +106,7 @@ class WingSupervisorResource extends Resource
                 Forms\Components\Section::make('Asignación del responsable de beca')
                     ->schema([
                         Forms\Components\Select::make('campus')
-                                ->label('Campus')
+                                ->label('Sede')
                                 ->options([
                                     'Universitaria' => 'Universitaria',
                                     'Félix Varela' => 'Félix Varela',
@@ -121,7 +132,7 @@ class WingSupervisorResource extends Resource
 
                             // Campo para seleccionar el edificio (filtrado por sede)
                             Forms\Components\Select::make('building_id')
-                                ->label('Building')
+                                ->label('Edificio')
                                 ->options(fn (Get $get): Collection => Building::query()
                                                 ->where('campus', $get('campus'))
                                                 ->pluck('name', 'id')
@@ -140,9 +151,11 @@ class WingSupervisorResource extends Resource
                                         $set('building_id', $buildingName);
                                     }
                                 })
-                                ->placeholder('Select a building'),
+                                ->placeholder('Seleccione un edificio'),
                     Forms\Components\Select::make('wing_id')
                         ->required()
+                        ->label('Ala')
+                        ->placeholder('Seleccione un ala')
                         ->relationship('wing', 'name')
                         ->options(fn (Get $get): Collection => Wing::query()
                                     ->where('building_id', $get('building_id'))
@@ -161,19 +174,15 @@ class WingSupervisorResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('professor.name')
+                    ->label('Responsable')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('wing.building.name')
+                    ->label('Edificio')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('wing.name')
+                    ->label('Ala')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                
             ])
             
             ->filters([

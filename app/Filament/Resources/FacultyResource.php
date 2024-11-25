@@ -19,7 +19,11 @@ class FacultyResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?string $navigationGroup = 'Academic Management';
+    protected static ?string $label = 'Facultad';
+    
+    protected static ?string $pluralLabel = 'Facultades';
+
+    protected static ?string $navigationGroup = 'Gestión Académica';
     
     protected static ?int $navigationSort = 7;
 
@@ -33,6 +37,7 @@ class FacultyResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -43,30 +48,24 @@ class FacultyResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nombre de la Facultad')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                ->tooltip('View Faculty')
+                ->tooltip('Ver Facultad')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\EditAction::make()
-                ->tooltip('Edit Facuty')
+                ->tooltip('Editar Facutad')
                 ->label('')
                 ->size('xl'),
                 Tables\Actions\DeleteAction::make()
-                ->tooltip('Delete Faculty')
+                ->tooltip('Eliminar Facultad')
                 ->label('')
                 ->size('xl'),
             ])

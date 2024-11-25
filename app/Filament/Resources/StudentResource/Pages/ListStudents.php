@@ -22,12 +22,12 @@ class ListStudents extends ListRecords
     {
         if(!auth()->user()->hasRole('Wing_Supervisor') && !auth()->user()->hasRole('Faculty_Dean') && !auth()->user()->hasRole('Year_Lead_Professor')){
             $tabs = [
-            'local_students' => Tab::make('Local Students')
+            'local_students' => Tab::make('Estudiantes locales')
                 ->badge(Student::where('is_foreign', false)->count())
                 ->modifyQueryUsing(function ($query) {
                     return $query->where('is_foreign', false); // Filtrar solo estudiantes locales
                 }),
-            'foreign_students' => Tab::make('Foreign Students')
+            'foreign_students' => Tab::make('Estudiantes extrangeros')
                 ->badge(Student::where('is_foreign', true)->count())
                 ->modifyQueryUsing(function ($query) {
                     return $query->where('is_foreign', true); // Filtrar solo estudiantes extranjeros

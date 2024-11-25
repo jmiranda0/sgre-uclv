@@ -27,4 +27,10 @@ class CreateProfessor extends CreateRecord
         // Retornar los datos modificados para crear el professor
         return $data;
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+    
 }

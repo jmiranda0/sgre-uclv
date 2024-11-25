@@ -22,7 +22,9 @@ class BuildingResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
-    protected static ?string $navigationGroup = 'Building Management';
+    protected static ?string $label = 'Edificios';
+
+    protected static ?string $navigationGroup = 'Control de recidencias';
 
     protected static ?int $navigationSort = 1;
 
@@ -36,11 +38,12 @@ class BuildingResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre del edificio')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('campus')
                     ->label('Campus')
-                    ->placeholder('Select a campus')
+                    ->placeholder('Selecciona la cede')
                     ->options([
                         'Universitaria' => CampusEnum :: UNI->value,                        
                         'Félix Varela' => CampusEnum :: VAREL->value,                        
@@ -55,21 +58,11 @@ class BuildingResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                     ->label('Edificio')
                     ->searchable()
                     ->alignCenter(),
-                
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->alignCenter()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->alignCenter()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('wings_count')
-                    ->label('Number of Wings')
+                    ->label('Número de alas')
                     ->counts('wings') // Cuenta las alas relacionadas
                     ->getStateUsing(function ($record) {
                         return $record->wings_count > 0 ? $record->wings_count : 'No wings';
@@ -82,15 +75,15 @@ class BuildingResource extends Resource
             ->actions([
                 
                     Tables\Actions\ViewAction::make()
-                        ->tooltip('View Building')
+                        ->tooltip('Ver Edificio')
                         ->label('')
                         ->size('xl'),
                     Tables\Actions\EditAction::make()
-                        ->tooltip('Edit Building')
+                        ->tooltip('Editar Edificio')
                         ->label('')
                         ->size('xl'),
                     Tables\Actions\DeleteAction::make()
-                        ->tooltip('Delete Building')
+                        ->tooltip('Eliminar Edificio')
                         ->label('')
                         ->size('xl'),
                 ])

@@ -21,7 +21,7 @@ class ListBuildings extends ListRecords
     public function getTabs(): array
     {
         $tabs = [
-            'Univercitary' => Tab::make('Univercitary')
+            'Univercitaria' => Tab::make('Universitaria')
                 ->badge(Building::where('campus', 'Universitaria')->count())
                 ->modifyQueryUsing(function ($query) {
                     return $query->where('campus', 'Universitaria');

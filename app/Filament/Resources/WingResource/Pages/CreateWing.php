@@ -9,4 +9,10 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateWing extends CreateRecord
 {
     protected static string $resource = WingResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+    
 }

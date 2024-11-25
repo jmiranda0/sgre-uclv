@@ -21,6 +21,14 @@ class ProfessorResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $label = 'Profesor';
+    
+    protected static ?string $pluralLabel = 'Profesores';
+
+    protected static ?string $navigationGroup = 'Recursos humanos';
+
+    protected static ?int $navigationSort = 1;
+
     public static function canAccess(): bool
     {
         return auth()->user()->hasRole('GM') ;
@@ -33,9 +41,11 @@ class ProfessorResource extends Resource
                 Forms\Components\Section::make('Datos del Profesor')
                     ->schema([
                         Forms\Components\TextInput::make('name')
+                            ->label('Nombre')
                             ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('dni')
+                            ->label('CI')
                             ->required()
                             //->unique('professors', 'dni',null,ignoreRecord: true)
                             ->maxLength(11)
@@ -54,7 +64,7 @@ class ProfessorResource extends Resource
 
                         
                         Forms\Components\Toggle::make('existing_user')
-                            ->label('existing user')
+                            ->label('Usuario existente')
                             ->reactive(),
                     ])
                     ->collapsible()
@@ -63,8 +73,9 @@ class ProfessorResource extends Resource
                     ->schema([
                         
                         Forms\Components\Select::make('user_id')
-                        ->label('select a user')
+                        ->label('Usuario')
                         ->relationship('user', 'email')
+                        ->placeholder('Selecciona un usuario')
                         ->searchable()
                         ->disabled(fn (callable $get) => !$get('existing_user')) // Solo habilitado si existing_user es verdadero
                         ->visible(fn (callable $get) => $get('existing_user'))
@@ -76,7 +87,7 @@ class ProfessorResource extends Resource
                         })->columnSpanFull(),
     
                         Forms\Components\TextInput::make('user.email')
-                        ->label( "User's email")
+                        ->label( "Correo del usuario")
                         ->email()
                         //->unique('users', 'email', ignoreRecord: true)
                         ->visible(fn (callable $get) => !$get('existing_user'))
@@ -101,7 +112,7 @@ class ProfessorResource extends Resource
 
 
                     Forms\Components\TextInput::make('user.password')
-                        ->label("User's password")
+                        ->label("Contraseña del usuario")
                         ->password()
                         ->visible(fn (callable $get) => !$get('existing_user'))
                         ->minLength(8), // Puedes ajustar la longitud mínima de la contraseña
@@ -117,28 +128,36 @@ class ProfessorResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('dni')
+                    ->label('CI')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.email')
+                    ->label('Usuario')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.roles.name')
+                    ->label('Rol')
                     ->formatStateUsing(fn ($state) => $state ? $state : '?')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()
+                ->tooltip('Ver profesor')
+                ->label('')
+                ->size('xl'),
+                Tables\Actions\EditAction::make()
+                ->tooltip('Editar profesor')
+                ->label('')
+                ->size('xl'),
+                Tables\Actions\DeleteAction::make()
+                ->tooltip('Eliminar profesor')
+                ->label('')
+                ->size('xl'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

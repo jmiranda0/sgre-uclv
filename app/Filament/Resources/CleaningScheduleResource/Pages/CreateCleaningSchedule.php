@@ -9,4 +9,10 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateCleaningSchedule extends CreateRecord
 {
     protected static string $resource = CleaningScheduleResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+    
 }

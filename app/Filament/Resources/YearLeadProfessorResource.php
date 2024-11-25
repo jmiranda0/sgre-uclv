@@ -28,6 +28,14 @@ class YearLeadProfessorResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $label = 'Profesor Principal de Año';
+
+    protected static ?string $pluralLabel = 'Profesores Principales de Año';
+
+    protected static ?string $navigationGroup = 'Recursos humanos';
+
+    protected static ?int $navigationSort = 4;
+
     public static function canAccess(): bool
     {
         return auth()->user()->hasRole('GM') || auth()->user()->hasRole('Faculty_Dean');
@@ -47,7 +55,7 @@ class YearLeadProfessorResource extends Resource
                     ->schema([    
                             Forms\Components\TextInput::make('professor.name')
                                 ->required()
-                                ->label('Name')
+                                ->label('Nombre')
                                 ->reactive()
                                 ->afterStateHydrated(function (Set $set, $record) {
                                     if ($record && $record->professor) {
@@ -58,6 +66,7 @@ class YearLeadProfessorResource extends Resource
                                 ->visible(fn (callable $get) => !$get('existing_P')),
 
                             Forms\Components\TextInput::make('professor.dni')
+                                ->label('CI')
                                 ->required()
                                 ->reactive()
                                 ->afterStateUpdated(function (callable $set, $state) {
@@ -79,12 +88,14 @@ class YearLeadProfessorResource extends Resource
                                 ->visible(fn (callable $get) => !$get('existing_P')),
                                 
                             Forms\Components\Select::make('professor_id')
+                                ->label('Profesor')
+                                ->placeholder('Seleccione un profesor')
                                 ->relationship('professor', 'name')
                                 ->options(function () { 
                                     // Aquí obtienes a los profesores que no están asociados
                                     return Professor::whereDoesntHave('yearleadprofessor') // Asegúrate de que no están en la tabla de PPAs
                                         ->whereDoesntHave('groupadvisor')  // Asegúrate de que no están en la tabla de PGs
-                                        ->whereDoesntHave('dean') // Asegúrate de que no están en la tabla de Decanos
+                                        ->whereDoesntHave('dean') // Asegúrate de que no están en la tabla de Profesor Principal de Años
                                         ->whereDoesntHave('wingSupervisor') // Asegúrate de que no están en la tabla de Supervisores de Ala
                                         ->pluck('name', 'id'); // Obtener solo el nombre y el id
                                 })
@@ -97,7 +108,7 @@ class YearLeadProfessorResource extends Resource
                                 ->columnSpanFull(),
 
                             Forms\Components\Toggle::make('existing_P')
-                                ->label('Existing Professor')
+                                ->label('Profesor Existente')
                                 ->reactive(),
                     ])
                         ->collapsible()
@@ -107,9 +118,9 @@ class YearLeadProfessorResource extends Resource
                 Forms\Components\Section::make('Datos del Profesor')
                     ->schema([
                             Forms\Components\Select::make('faculty_id')
-                                ->label('Faculty')
+                                ->label('Facultad')
                                 ->visible(auth()->user()->hasRole('GM'))
-                                ->placeholder('Select a Faculty')
+                                ->placeholder('Selecciona una Facultad')
                                 ->options(Faculty::all()->pluck('name', 'id'))
                                 ->searchable()
                                 ->preload()
@@ -125,8 +136,8 @@ class YearLeadProfessorResource extends Resource
                                     }
                                 }),
                             Forms\Components\Select::make('career_id')
-                                ->label('career')
-                                ->placeholder('Select a career')
+                                ->label('Carrera')
+                                ->placeholder('Selecciona una carrera')
                                 ->options( auth()->user()->hasRole('GM')? 
                                             fn (Get $get): Collection => Career::query()
                                                 ->where('faculty_id', $get('faculty_id'))
@@ -147,7 +158,7 @@ class YearLeadProfessorResource extends Resource
                                     }
                                 }),
                             Forms\Components\Select::make('career_year_id')
-                                ->label('academic year')
+                                ->label('Año académico')
                                 ->relationship(name:'careerYear', titleAttribute: 'name')
                                 ->options(fn (Get $get): Collection => CareerYear::query()
                                                         ->where('career_id', $get('career_id'))
@@ -156,7 +167,7 @@ class YearLeadProfessorResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->placeholder('Select an acacemic year')
+                                ->placeholder('Selecciona el año académico')
                                 ->required(),
                     ])
                         ->collapsible()
@@ -171,34 +182,27 @@ class YearLeadProfessorResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('professor.name')
-                    ->numeric()
+                    ->label('Profesor Principal de Año')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('careerYear.name')
-                    ->numeric()
+                    ->label('Año académico')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->tooltip('View Year Lead Professor')
+                    ->tooltip('Ver Profesor Principal de Año')
                     ->label('')
                     ->size('xl'),
                 Tables\Actions\EditAction::make()
-                    ->tooltip('Edit Year Lead Professor')
+                    ->tooltip('Editar Profesor Principal de Año')
                     ->label('')
                     ->size('xl'),
                 Tables\Actions\DeleteAction::make()
-                    ->tooltip('Delete Year Lead Professor')
+                    ->tooltip('Eliminar Profesor Principal de Año')
                     ->label('')
                     ->size('xl'),
             ])
